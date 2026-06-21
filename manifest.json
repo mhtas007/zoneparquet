@@ -2,7 +2,6 @@
   "name": "Zone Parquet",
   "short_name": "Zone Parquet",
   "description": "کەتەلۆگ و سیستەمی زۆن پارکێت",
-  "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1310",
   "theme_color": "#1a1310",
