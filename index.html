@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1310">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
     <title>Zone Parquet | کەتەلۆگ و سیستەم</title>
     
     <!-- Tailwind CSS -->
@@ -671,8 +674,14 @@
                     <h2 class="text-xl font-black text-gray-800">بەخێربێیتەوە بەڕێوەبەر 👋</h2>
                     <p class="text-sm text-gray-500 font-bold mt-1" id="currentDateDisplay"></p>
                 </div>
-                <div class="w-12 h-12 bg-wood-100 rounded-full flex items-center justify-center border-2 border-wood-200 text-wood-600">
-                    <i class="fas fa-user-shield text-xl"></i>
+                <div class="flex items-center gap-4">
+                    <button id="notificationBell" class="relative w-12 h-12 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center border border-gray-200 text-gray-600 transition-colors shadow-sm pulse-btn" onclick="window.requestNotificationPermission()">
+                        <i class="fas fa-bell text-xl" id="bellIcon"></i>
+                        <span id="notificationBadge" class="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full hidden"></span>
+                    </button>
+                    <div class="w-12 h-12 bg-wood-100 rounded-full flex items-center justify-center border-2 border-wood-200 text-wood-600 shadow-sm">
+                        <i class="fas fa-user-shield text-xl"></i>
+                    </div>
                 </div>
             </div>
 
@@ -1412,7 +1421,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // User's provided Firebase config
@@ -2827,6 +2836,74 @@ service cloud.firestore {
             btn.innerHTML = '<i class="fab fa-telegram-plane text-xl"></i> ناردنی داواکاری بۆ کۆمپانیا';
             btn.disabled = false;
         });
+
+        // Professional Notification System
+        window.requestNotificationPermission = function() {
+            if (!("Notification" in window)) {
+                showToast("وێبگەڕەکەت پشتگیری نۆتیفیکەیشن ناکات", "error");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    showToast("مۆڵەتی نۆتیفیکەیشن بە سەرکەوتوویی درا");
+                    const icon = document.getElementById('bellIcon');
+                    if(icon) {
+                        icon.classList.remove('text-gray-600');
+                        icon.classList.add('text-gold-500', 'animate-pulse');
+                        setTimeout(() => icon.classList.remove('animate-pulse'), 2000);
+                    }
+                } else {
+                    showToast("مۆڵەتی نۆتیفیکەیشن ڕەتکرایەوە", "error");
+                }
+            });
+        }
+
+        // Listen for new orders/notifications (Live Controller Feature)
+        let isInitialLoad = true;
+        onSnapshot(collection(db, "orders"), (snapshot) => {
+            if (isInitialLoad) {
+                isInitialLoad = false;
+                return;
+            }
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added") {
+                    const data = change.doc.data();
+                    const msg = `داواکارییەکی نوێ هاتووە لەلایەن: ${data.customerName || 'کڕیارێکی نوێ'}`;
+                    
+                    // Show Toast
+                    showToast(msg, "success");
+                    
+                    // Show Badge on Bell
+                    const badge = document.getElementById('notificationBadge');
+                    if(badge) badge.classList.remove('hidden');
+
+                    // Play sound
+                    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                    audio.play().catch(e => console.log('Audio play blocked:', e));
+
+                    // Show System Notification
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        new Notification("زۆن پارکێت | داواکاری نوێ", {
+                            body: msg,
+                            icon: "/icon-192.png",
+                            badge: "/icon-192.png",
+                            dir: "rtl"
+                        });
+                    }
+                }
+            });
+        });
+
+        // Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('PWA ServiceWorker registered with scope:', registration.scope);
+                }).catch(err => {
+                    console.log('PWA ServiceWorker registration failed:', err);
+                });
+            });
+        }
 
         // Initialize Router
         handleRoute();
