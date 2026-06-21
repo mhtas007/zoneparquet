@@ -3664,6 +3664,65 @@ service cloud.firestore {
             window.changeLanguage(savedLang);
         });
     </script>
+    <!-- Professional Auto-Update Checker -->
+    <script>
+        (function() {
+            let currentEtag = null;
+            let currentLastModified = null;
+            
+            async function checkForUpdate() {
+                try {
+                    const response = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+                    const etag = response.headers.get('Etag');
+                    const lastModified = response.headers.get('Last-Modified');
+                    
+                    if (!currentEtag && !currentLastModified) {
+                        currentEtag = etag;
+                        currentLastModified = lastModified;
+                        return;
+                    }
+
+                    if ((etag && currentEtag && etag !== currentEtag) || 
+                        (lastModified && currentLastModified && lastModified !== currentLastModified)) {
+                        showUpdateToast();
+                    }
+                } catch (e) {
+                    console.log('Update check failed', e);
+                }
+            }
+
+            function showUpdateToast() {
+                if(document.getElementById('update-toast')) return;
+                
+                const toast = document.createElement('div');
+                toast.id = 'update-toast';
+                toast.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-[99999] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-gold-200 p-4 flex items-center gap-4 fade-in-up w-[90%] max-w-md';
+                toast.innerHTML = `
+                    <div class="w-12 h-12 bg-gold-50 text-gold-500 rounded-full flex items-center justify-center text-xl shadow-inner border border-gold-100 flex-shrink-0">
+                        <i class="fas fa-sync-alt animate-spin"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="font-black text-wood-900 text-sm md:text-base">وەشانێکی نوێ بەردەستە 🚀</h4>
+                        <p class="text-xs md:text-sm text-wood-500 font-medium mt-0.5">زانیارییەکان نوێکرانەوە، تکایە ڕیفرێش بکە.</p>
+                    </div>
+                    <button onclick="window.location.reload(true)" class="bg-gradient-to-r from-wood-800 to-wood-950 hover:from-wood-950 hover:to-black text-gold-400 font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg text-sm flex-shrink-0 pulse-btn border border-wood-700">
+                        ڕیفرێش
+                    </button>
+                    <button onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 w-7 h-7 bg-white text-gray-400 hover:text-red-500 rounded-full flex items-center justify-center shadow-sm border border-gray-200 transition-colors">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                document.body.appendChild(toast);
+            }
+
+            setTimeout(checkForUpdate, 3000); // Initial check
+            setInterval(checkForUpdate, 5 * 60 * 1000); // Check every 5 minutes
+            
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') checkForUpdate();
+            });
+        })();
+    </script>
 </body>
 </html>
 
