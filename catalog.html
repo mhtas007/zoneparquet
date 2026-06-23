@@ -5,7 +5,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="icon" type="image/png" href="logo.png">
-    <title>Zone Parquet | سەرەتا</title>
+    <title>Zone Parquet | کەتەلۆگ</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -193,28 +193,156 @@
             </div>
         </header>
 
-        <main><section id="why-us" class="py-24 bg-paper relative">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div class="text-center mb-16">
-                        <h2 class="text-4xl font-black text-gray-900 mb-4">بۆچی زۆن پارکێت؟</h2>
-                        <p class="text-gray-500 font-medium max-w-2xl mx-auto">ئێمە تەنها پارکێت نافرۆشین، بەڵکو کوالیتی و جوانی و پاکێجی تەواوکەر پێشکەش دەکەین.</p>
+        <main><section id="catalog" class="py-24 bg-gray-50 relative">
+                <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col mb-16 gap-6">
+                        <div class="text-center md:text-right">
+                            <h2 class="text-4xl font-black text-gray-900 mb-3"><span data-i18n="cat_title">کەتەلۆگی بەرهەمەکان</span></h2>
+                            <p class="text-gray-500 font-medium"><span data-i18n="cat_desc">جۆرە جیاوازەکانی پارکێت بە قیاس و ڕەنگی جیاواز</span></p>
+                        </div>
+                        <!-- Premium Category Scroll -->
+                        <div class="w-full overflow-x-auto pb-4 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+                            <div class="flex items-center gap-3 w-max" id="retailCategoryTabs">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Secondary Filters -->
+                        <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between z-20 relative w-full">
+                            <div class="flex items-center gap-2 text-brand font-black text-lg px-2 hidden xl:flex">
+                                <i class="fas fa-sliders-h"></i> فلتەری زیاتر
+                            </div>
+                            <div class="flex flex-wrap gap-3 items-center justify-center w-full xl:w-auto">
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-sort-amount-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors"></i>
+                                    <select id="sortPriceRetail" onchange="window.applyRetailFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-brand-light rounded-xl text-sm font-bold outline-none focus:border-brand transition-colors cursor-pointer appearance-none">
+                                        <option value="">ڕیزکردنی نرخ</option>
+                                        <option value="asc">کەمترین بۆ بەرزترین</option>
+                                        <option value="desc">بەرزترین بۆ کەمترین</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-palette absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors"></i>
+                                    <select id="filterColorRetail" onchange="window.applyRetailFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-brand-light rounded-xl text-sm font-bold outline-none focus:border-brand transition-colors cursor-pointer appearance-none">
+                                        <option value="">تۆنی ڕەنگەکان</option>
+                                        <option value="dark_warm">تۆخ و گەرم</option>
+                                        <option value="light_bright">کاڵ و ڕووناک</option>
+                                        <option value="gray_modern">خۆڵەمێشی و مۆدێرن</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-shield-alt absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors"></i>
+                                    <select id="filterACRetail" onchange="window.applyRetailFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-brand-light rounded-xl text-sm font-bold outline-none focus:border-brand transition-colors cursor-pointer appearance-none">
+                                        <option value="">کوالیتی (AC)</option>
+                                        <option value="AC3">AC3</option>
+                                        <option value="AC4">AC4</option>
+                                        <option value="AC5">AC5</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <label class="flex items-center gap-2 cursor-pointer bg-gray-50 py-3 px-4 rounded-xl border-2 border-gray-100 hover:border-brand-light transition-colors w-full sm:w-auto justify-center">
+                                    <div class="relative flex items-center">
+                                        <input type="checkbox" id="filterWaterproofRetail" onchange="window.applyRetailFilters()" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-700 flex items-center gap-1">دژە ئاو <i class="fas fa-tint text-blue-400"></i></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 hover:-translate-y-2 hover:shadow-premium transition-all duration-300 flex flex-col items-center text-center">
-                            <div class="w-16 h-16 rounded-2xl bg-brand/10 text-brand text-3xl flex items-center justify-center mb-6">🎁</div>
-                            <h3 class="text-2xl font-black text-gray-900 mb-3">پاکێجی کامڵ</h3>
-                            <p class="text-gray-500 font-medium">نرخی مەترێک ئیزارە و فۆمیش لەخۆ دەگرێت، بێ هیچ خەرجییەکی شاراوە.</p>
+                    
+                    <!-- Loading State -->
+                    <div id="catalog-loading" class="text-center py-20">
+                        <div class="w-16 h-16 border-4 border-wood-200 border-t-wood-600 rounded-full animate-spin mx-auto mb-6"></div>
+                        <p class="text-gray-500 font-bold text-lg"><span data-i18n="cat_loading">خەریکی هێنانی زانیارییەکان...</span></p>
+                    </div>
+
+                    <!-- Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 hidden" id="product-grid"></div>
+                    
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+                        <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-600"><span data-i18n="cat_empty">هیچ بەرهەمێک لە کەتەلۆگدا نییە.</span></h3>
+                    </div>
+                </div>
+            </section><section id="catalog" class="py-24 bg-gray-50 relative">
+                <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col mb-16 gap-6">
+                        <div class="text-center md:text-right">
+                            <h2 class="text-4xl font-black text-gray-900 mb-3"><span data-i18n="cat_title">کەتەلۆگی بەرهەمەکان</span></h2>
+                            <p class="text-gray-500 font-medium"><span data-i18n="cat_desc">جۆرە جیاوازەکانی پارکێت بە قیاس و ڕەنگی جیاواز</span></p>
                         </div>
-                        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 hover:-translate-y-2 hover:shadow-premium transition-all duration-300 flex flex-col items-center text-center">
-                            <div class="w-16 h-16 rounded-2xl bg-brand/10 text-brand text-3xl flex items-center justify-center mb-6">🛡️</div>
-                            <h3 class="text-2xl font-black text-gray-900 mb-3">هێزی ئەوروپی</h3>
-                            <p class="text-gray-500 font-medium">بەرگەگرتنی ئاست بەرز (AC4 &amp; AC5) گونجاو بۆ ماڵ و ئۆفیس و شوێنە گشتییەکان.</p>
+                        <!-- Premium Category Scroll -->
+                        <div class="w-full overflow-x-auto pb-4 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+                            <div class="flex items-center gap-3 w-max" id="wholesaleCategoryTabs">
+                                <!-- Populated dynamically -->
+                            </div>
                         </div>
-                        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 hover:-translate-y-2 hover:shadow-premium transition-all duration-300 flex flex-col items-center text-center">
-                            <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-500 text-3xl flex items-center justify-center mb-6">💧</div>
-                            <h3 class="text-2xl font-black text-gray-900 mb-3">دژە ئاو</h3>
-                            <p class="text-gray-500 font-medium">پاراستنی تەواوەتی تا ٢٤ کاتژمێر بەرامبەر شێ و ئاو بۆ زۆربەی مۆدێلەکان.</p>
+
+                        <!-- Secondary Filters -->
+                        <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between z-20 relative w-full">
+                            <div class="flex items-center gap-2 text-brand font-black text-lg px-2 hidden xl:flex">
+                                <i class="fas fa-sliders-h"></i> فلتەری زیاتر
+                            </div>
+                            <div class="flex flex-wrap gap-3 items-center justify-center w-full xl:w-auto">
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-sort-amount-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors"></i>
+                                    <select id="sortPriceWhole" onchange="window.applyWholesaleFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-brand-light rounded-xl text-sm font-bold outline-none focus:border-brand transition-colors cursor-pointer appearance-none">
+                                        <option value="">ڕیزکردنی نرخ</option>
+                                        <option value="asc">کەمترین بۆ بەرزترین</option>
+                                        <option value="desc">بەرزترین بۆ کەمترین</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-palette absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors"></i>
+                                    <select id="filterColorWhole" onchange="window.applyWholesaleFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-brand-light rounded-xl text-sm font-bold outline-none focus:border-brand transition-colors cursor-pointer appearance-none">
+                                        <option value="">تۆنی ڕەنگەکان</option>
+                                        <option value="dark_warm">تۆخ و گەرم</option>
+                                        <option value="light_bright">کاڵ و ڕووناک</option>
+                                        <option value="gray_modern">خۆڵەمێشی و مۆدێرن</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-shield-alt absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand transition-colors"></i>
+                                    <select id="filterACWhole" onchange="window.applyWholesaleFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-brand-light rounded-xl text-sm font-bold outline-none focus:border-brand transition-colors cursor-pointer appearance-none">
+                                        <option value="">کوالیتی (AC)</option>
+                                        <option value="AC3">AC3</option>
+                                        <option value="AC4">AC4</option>
+                                        <option value="AC5">AC5</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <label class="flex items-center gap-2 cursor-pointer bg-gray-50 py-3 px-4 rounded-xl border-2 border-gray-100 hover:border-brand-light transition-colors w-full sm:w-auto justify-center">
+                                    <div class="relative flex items-center">
+                                        <input type="checkbox" id="filterWaterproofWhole" onchange="window.applyWholesaleFilters()" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-700 flex items-center gap-1">دژە ئاو <i class="fas fa-tint text-blue-400"></i></span>
+                                </label>
+                            </div>
                         </div>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div id="catalog-loading" class="text-center py-20">
+                        <div class="w-16 h-16 border-4 border-wood-200 border-t-wood-600 rounded-full animate-spin mx-auto mb-6"></div>
+                        <p class="text-gray-500 font-bold text-lg"><span data-i18n="cat_loading">خەریکی هێنانی زانیارییەکان...</span></p>
+                    </div>
+
+                    <!-- Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 hidden" id="product-grid"></div>
+                    
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+                        <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-600"><span data-i18n="cat_empty">هیچ بەرهەمێک لە کەتەلۆگدا نییە.</span></h3>
                     </div>
                 </div>
             </section></main>
