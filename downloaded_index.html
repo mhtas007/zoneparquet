@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Files Collection</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 32px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 32px;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+
+    .file-list {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 6px;
+    }
+
+    .file-list th {
+      text-align: left;
+      padding: 16px 20px;
+      background-color: rgba(44, 62, 80, 0.05);
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+
+    .file-list td {
+      padding: 0;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+    }
+
+    .file-list tr:hover td {
+      background-color: #f8f9fa;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .file-list a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      color: inherit;
+      text-decoration: none;
+      width: 100%;
+    }
+
+    .file-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+    }
+
+    .file-icon::before {
+      content: "";
+      width: 28px;
+      height: 28px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    .file-list tr:hover .file-icon::before {
+      transform: scale(1.1);
+    }
+
+    /* 图片文件 */
+    .file-icon.ico::before,
+    .file-icon.svg::before,
+    .file-icon.png::before,
+    .file-icon.jpg::before,
+    .file-icon.jpeg::before,
+    .file-icon.gif::before,
+    .file-icon.webp::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234CAF50'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E");
+    }
+
+    /* 文档文件 */
+    .file-icon.md::before,
+    .file-icon.html::before,
+    .file-icon.default::before,
+    .file-icon.doc::before,
+    .file-icon.docx::before,
+    .file-icon.txt::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232196F3'%3E%3Cpath d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/%3E%3C/svg%3E");
+    }
+
+    /* CSS文件 */
+    .file-icon.css::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231572B6' d='M4.192 3.143h15.615l-1.42 16.034-6.404 1.812-6.369-1.813L4.192 3.143zM16.9 6.424l-9.8-.002.158 1.949 7.529.002-.189 2.02H9.66l.179 1.913h4.597l-.272 2.62-2.164.598-2.197-.603-.141-1.569h-1.94l.216 2.867L12 17.484l3.995-1.137.905-9.923z'/%3E%3C/svg%3E");
+    }
+
+    /* JavaScript文件 */
+    .file-icon.js::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFC107'%3E%3Cpath d='M3 3h18v18H3V3zm16.525 13.707c-.131-.821-.666-1.511-2.252-2.155-.552-.259-1.165-.438-1.349-.854-.068-.248-.078-.382-.034-.529.113-.484.687-.629 1.137-.495.293.09.563.315.732.676.775-.507.775-.507 1.316-.844-.203-.314-.304-.451-.439-.586-.473-.528-1.103-.798-2.126-.775l-.528.067c-.507.124-.991.395-1.283.754-.855.968-.608 2.655.427 3.354 1.023.765 2.521.933 2.712 1.653.18.878-.652 1.159-1.475 1.058-.607-.136-.945-.439-1.316-1.002l-1.372.788c.157.359.337.517.607.832 1.305 1.316 4.568 1.249 5.153-.754.021-.067.18-.528.056-1.237l.034.049zm-6.737-5.434h-1.686c0 1.453-.007 2.898-.007 4.354 0 .924.047 1.772-.104 2.033-.247.517-.886.451-1.175.359-.297-.146-.448-.349-.623-.641-.047-.078-.082-.146-.095-.146l-1.368.844c.229.473.563.879.994 1.137.641.383 1.502.507 2.404.305.588-.17 1.095-.519 1.358-1.059.384-.697.302-1.553.299-2.509.008-1.541 0-3.083 0-4.635l.003-.042z'/%3E%3C/svg%3E");
+    }
+
+    /* PDF文件 */
+    .file-icon.pdf::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F44336'%3E%3Cpath d='M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z'/%3E%3C/svg%3E");
+    }
+
+    /* 视频文件 */
+    .file-icon.mp4::before,
+    .file-icon.mov::before,
+    .file-icon.avi::before,
+    .file-icon.webm::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239C27B0'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E");
+    }
+
+    .file-name {
+      color: #2c3e50;
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      margin-left: 12px;
+    }
+
+    .copy-btn:hover {
+      background-color: rgba(44, 62, 80, 0.05);
+      color: #2c3e50;
+    }
+
+    .copy-btn svg {
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+    }
+
+    .copy-btn.copied {
+      color: #10b981;
+      pointer-events: none;
+    }
+
+    .copy-btn.copied svg {
+      animation: scale 0.3s ease;
+    }
+
+    @keyframes scale {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.2);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Collection</h1>
+    <table class="file-list">
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+            <tr>
+                <td>
+                    <a href="https://brave-peach-bg7nrtmx.edgeone.dev/Zone%20Parquet%20Logo%20[Recovered].png">
+                        <div class="file-icon png">
+                            <span class="file-name">Zone Parquet Logo [Recovered].png</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyLink(this, event)" aria-label="Copy link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                        </button>
+                    </a>
+                </td>
+            </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function copyLink(button, event) {
+      event.preventDefault();
+      const link = button.closest('a').getAttribute('href');
+      navigator.clipboard.writeText(link).then(() => {
+        button.classList.add('copied');
+
+        // 更改图标为勾选标记
+        button.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />' +
+          '</svg>'
+          ;
+
+        // 1.5秒后恢复原始状态
+        setTimeout(() => {
+          button.classList.remove('copied');
+          button.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />' +
+            '</svg>'
+            ;
+        }, 1500);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+      });
+    }
+  </script>
+</body>
+
+</html>

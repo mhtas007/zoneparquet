@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1310">
+    <link rel="manifest" href="/assets/manifest-CeLkyA4i.json">
+    <link rel="apple-touch-icon" href="/assets/logo-BO_EXJtV.png">
+    <link rel="icon" type="image/png" href="/assets/logo-BO_EXJtV.png">
+    <title>Zone Parquet | کەتەلۆگ و سیستەم</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wood: {
+                            50: '#fdf8f6', 100: '#f2e8e5', 200: '#eaddd7', 300: '#e0cec7',
+                            400: '#d2bab0', 500: '#a37c6c', 600: '#8b6456', 700: '#6b4d42',
+                            800: '#4c372f', 900: '#2d211c', 950: '#1a1310'
+                        },
+                        gold: {
+                            400: '#E6C96B', 500: '#D4AF37', 600: '#AA8C2C',
+                        }
+                    },
+                    fontFamily: {
+                        'kurdish': ['Franklin Gothic Book', 'Speda Bold', 'Speda', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium': '0 25px 50px -12px rgba(139, 100, 86, 0.25)',
+                        'glow': '0 0 15px rgba(212, 175, 55, 0.5)',
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <!-- OneSignal Push Notifications (Clean Init) -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      const ONESIGNAL_APP_ID = "7188fc71-50a7-4d0d-8b3d-3b11d5c1880e"; // App ID added
+      const ONESIGNAL_REST_API_KEY = "os_v2_app_ogepy4kqu5gq3cz5hmi5lqmibztxvhulm2dep652mg5ef32ong2lyvz5fcz3gvzhowqdks6m4ctojij2sp4o54674rpy4fpq26fhuoy"; // API Key added
+
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: ONESIGNAL_APP_ID,
+          notifyButton: {
+            enable: true,
+            colors: {
+                'circle.background': '#a37c6c',
+                'circle.foreground': 'white',
+            }
+          },
+        });
+      });
+      
+      // Function to send push notification to Admins
+        window.sendAdminPushNotification = function(title, message) {
+            fetch("/api/notify", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title: title,
+                    message: message
+                })
+            }).catch(err => console.error("OneSignal proxy push error:", err));
+        };
+    </script>
+
+    <style>
+        body { font-family: 'Franklin Gothic Book', 'Speda Bold', 'Speda', sans-serif; background-color: #FAFAF9; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+        body.modal-open { overflow: hidden; }
+
+        /* General Styles */
+        .product-card { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center bottom; }
+        .product-card:hover { transform: translateY(-12px); box-shadow: 0 30px 60px -15px rgba(163, 124, 108, 0.3); }
+        .product-img-wrapper img { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .product-card:hover .product-img-wrapper img { transform: scale(1.1); }
+        .filter-btn-retail, .filter-btn-whole { transition: all 0.3s ease; }
+        .filter-btn-retail.active, .filter-btn-whole.active { background: linear-gradient(135deg, #8b6456, #4c372f); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(139, 100, 86, 0.4); }
+        #map { height: 350px; width: 100%; border-radius: 1rem; z-index: 1; border: 2px solid #eaddd7; }
+        .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(40px); }
+        
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); } 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } }
+        
+        .pulse-btn:hover { animation: pulseGlow 1.5s infinite; }
+
+        /* Modals & Scrollbars */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #fdf8f6; border-radius: 10px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d2bab0; border-radius: 10px; border: 2px solid #fdf8f6; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a37c6c; }
+        
+        /* Toast */
+        #toast { visibility: hidden; background: linear-gradient(135deg, #2d211c, #1a1310); color: #fff; padding: 16px 28px; border-radius: 16px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px) scale(0.9); opacity: 0; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 14px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+
+        /* Glassmorphism */
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+
+        /* Print Styles for Invoice */
+        @media print {
+            body * { visibility: hidden; }
+            #print-invoice-area, #print-invoice-area * { visibility: visible; }
+            #print-invoice-area { display: flex !important; flex-direction: column; position: absolute; left: 0; top: 0; width: 100%; height: 296mm; background: white; padding: 0 !important; margin: 0 !important; z-index: 99999; box-sizing: border-box; }
+            @page { size: A4; margin: 0; }
+            .print-exact { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .shadow-lg, .shadow-md, .shadow-sm, .shadow-premium { box-shadow: none !important; }
+        }
+    </style>
+    
+    <!-- Duplicate OneSignal Removed -->
+  <script type="module" crossorigin src="/assets/index-BJElsME8.js"></script>
+</head>
+<body class="text-gray-800 antialiased relative">
+
+    <!-- ==================== MAIN PUBLIC APP ==================== -->
+    <div id="public-app" class="block">
+        <header id="site-header" class="bg-white/85 backdrop-blur-xl shadow-sm sticky top-0 z-40 transition-all border-b border-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center">
+                        <a href="#" id="brand-logo" class="flex items-center gap-3 group cursor-pointer select-none" title="Zone Parquet">
+                            <img src="/assets/logo-BO_EXJtV.png" alt="Zone Parquet" class="w-12 h-12 rounded-xl object-contain shadow-lg transition-transform group-hover:scale-105 border border-wood-500/30 bg-white">
+                            <div class="flex flex-col">
+                                <span class="font-black text-2xl tracking-tight text-wood-900 leading-none">Zone <span class="text-wood-500">Parquet</span></span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="relative bg-gray-50 border border-gray-200 rounded-xl overflow-hidden flex items-center px-2 py-1 shadow-sm">
+                            <i class="fas fa-globe text-gray-400 text-sm ml-2 mr-2"></i>
+                            <select id="langSwitcher" onchange="changeLanguage(this.value)" class="bg-transparent text-gray-700 text-sm font-bold focus:outline-none appearance-none cursor-pointer py-1 pr-6 pl-2" dir="ltr">
+                                <option value="ku" selected>کوردی</option>
+                                <option value="en">English</option>
+                                <option value="ar">العربية</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-2 text-[10px] text-gray-400 pointer-events-none"></i>
+                        </div>
+                        <nav id="main-nav" class="hidden md:flex space-x-8 space-x-reverse items-center">
+                            <a href="#catalog" class="text-gray-600 hover:text-wood-600 font-bold transition" data-i18n="nav_catalog">کەتەلۆگ</a>
+                            <a href="#order" class="px-6 py-2.5 rounded-full bg-wood-900 text-white font-bold hover:bg-wood-800 transition shadow-md hover:shadow-lg" data-i18n="nav_order">داواکردن</a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Hero -->
+            <section class="relative bg-wood-900 overflow-hidden text-white py-28 lg:py-40 flex flex-col items-center text-center">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover opacity-20 mix-blend-luminosity">
+                    <div class="absolute inset-0 bg-gradient-to-t from-wood-950 via-wood-900/60 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-wood-900/80 via-transparent to-transparent"></div>
+                </div>
+                <div class="relative z-10 max-w-5xl mx-auto px-4">
+                    <div class="inline-block px-4 py-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400 font-bold text-sm mb-6 fade-in-up backdrop-blur-md shadow-glass"><span data-i18n="hero_badge">بەرزترین کوالیتی پارکێت لە کوردستان</span></div>
+                    <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 fade-in-up" style="animation-delay: 0.1s; line-height: 1.2;">
+                        <span data-i18n="hero_title_1">جوانی و سروشت بۆ</span> <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-wood-300"><span data-i18n="hero_title_2">ناوەوەی ماڵەکەت</span></span>
+                    </h1>
+                    <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto fade-in-up font-medium" style="animation-delay: 0.2s;">
+                        <span data-i18n="hero_desc">بەرزترین ئاستی پارکێت، دژە ئاو، ڕەنگی نەگۆڕ و ستایلی سەردەمیانە. ئێستا جۆرەکان ببینە و ڕاستەوخۆ داوای بکە بۆ گەیاندن.</span>
+                    </p>
+                    <div class="mt-10 fade-in-up" style="animation-delay: 0.3s;">
+                        <a href="#catalog" class="px-8 py-4 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-wood-900 font-black text-lg hover:shadow-glow transition pulse-btn inline-flex items-center gap-2">
+                            <span data-i18n="hero_btn">بینینی کەتەلۆگ</span> <i class="fas fa-arrow-down"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Catalog -->
+            <section id="catalog" class="py-24 bg-gray-50 relative">
+                <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col mb-16 gap-6">
+                        <div class="text-center md:text-right">
+                            <h2 class="text-4xl font-black text-gray-900 mb-3"><span data-i18n="cat_title">کەتەلۆگی بەرهەمەکان</span></h2>
+                            <p class="text-gray-500 font-medium"><span data-i18n="cat_desc">جۆرە جیاوازەکانی پارکێت بە قیاس و ڕەنگی جیاواز</span></p>
+                        </div>
+                        <!-- Premium Category Scroll -->
+                        <div class="w-full overflow-x-auto pb-4 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+                            <div class="flex items-center gap-3 w-max" id="retailCategoryTabs">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Secondary Filters -->
+                        <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between z-20 relative w-full">
+                            <div class="flex items-center gap-2 text-wood-500 font-black text-lg px-2 hidden xl:flex">
+                                <i class="fas fa-sliders-h"></i> فلتەری زیاتر
+                            </div>
+                            <div class="flex flex-wrap gap-3 items-center justify-center w-full xl:w-auto">
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-sort-amount-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                    <select id="sortPriceRetail" onchange="window.applyRetailFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-wood-300 rounded-xl text-sm font-bold outline-none focus:border-wood-500 transition-colors cursor-pointer appearance-none">
+                                        <option value="">ڕیزکردنی نرخ</option>
+                                        <option value="asc">کەمترین بۆ بەرزترین</option>
+                                        <option value="desc">بەرزترین بۆ کەمترین</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-globe absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                    <select id="filterCountryRetail" onchange="window.applyRetailFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-wood-300 rounded-xl text-sm font-bold outline-none focus:border-wood-500 transition-colors cursor-pointer appearance-none">
+                                        <option value="">هەموو وڵاتێک</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border-2 border-gray-100 focus-within:border-wood-500 transition-colors hover:border-wood-300 w-full sm:w-auto justify-center">
+                                    <input type="number" id="minPriceRetail" placeholder="کەمترین $" oninput="window.applyRetailFilters()" class="w-24 bg-white px-3 py-2 rounded-lg text-sm font-bold outline-none text-center shadow-sm" dir="ltr">
+                                    <span class="text-gray-400 font-black">-</span>
+                                    <input type="number" id="maxPriceRetail" placeholder="بەرزترین $" oninput="window.applyRetailFilters()" class="w-24 bg-white px-3 py-2 rounded-lg text-sm font-bold outline-none text-center shadow-sm" dir="ltr">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div id="catalog-loading" class="text-center py-20">
+                        <div class="w-16 h-16 border-4 border-wood-200 border-t-wood-600 rounded-full animate-spin mx-auto mb-6"></div>
+                        <p class="text-gray-500 font-bold text-lg"><span data-i18n="cat_loading">خەریکی هێنانی زانیارییەکان...</span></p>
+                    </div>
+
+                    <!-- Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 hidden" id="product-grid"></div>
+                    
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+                        <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-600"><span data-i18n="cat_empty">هیچ بەرهەمێک لە کەتەلۆگدا نییە.</span></h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Order Form -->
+            <section id="order" class="py-24 bg-white relative">
+                <div class="max-w-5xl mx-auto px-4 relative z-10">
+                    <div class="bg-white rounded-[2.5rem] shadow-premium overflow-hidden border border-gray-100 relative">
+                        <!-- Decor -->
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-wood-100 rounded-full blur-3xl -mr-32 -mt-32 z-0 opacity-50"></div>
+                        <div class="absolute bottom-0 left-0 w-64 h-64 bg-gold-50 rounded-full blur-3xl -ml-32 -mb-32 z-0 opacity-50"></div>
+                        
+                        <div class="bg-gradient-to-r from-wood-950 to-wood-800 text-white p-10 md:p-14 text-center relative z-10 overflow-hidden">
+                            <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');"></div>
+                            <h2 class="text-4xl font-black mb-4 relative z-10"><span data-i18n="order_title">فۆڕمی داواکاری پڕۆفیشناڵ</span></h2>
+                            <p class="text-wood-300 font-medium relative z-10 max-w-lg mx-auto"><span data-i18n="order_desc">زانیارییەکانت بە وردی پڕبکەرەوە، تیمی ئێمە لە کەمترین کاتدا پەیوەندیت پێوە دەکەن.</span></p>
+                        </div>
+                    <form id="orderForm" class="bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100 relative flex flex-col xl:flex-row">
+                        <!-- Left Side: Order Details & Total (Receipt style) -->
+                        <div class="w-full xl:w-2/5 bg-gray-50 p-8 md:p-12 relative border-b xl:border-b-0 xl:border-l border-gray-200">
+                            <!-- Decor inside left side -->
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-wood-100 rounded-bl-[100px] opacity-40 -mr-4 -mt-4"></div>
+                            <h3 class="text-2xl font-black mb-8 text-gray-900 relative z-10 flex items-center"><i class="fas fa-receipt text-wood-500 ml-3 text-3xl"></i> زانیاری داواکاری</h3>
+                            
+                            <div class="space-y-6 relative z-10">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700">جۆری پارکێت <span class="text-red-500">*</span></label>
+                                    <div class="relative group">
+                                        <i class="fas fa-box absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                        <select id="productSelect" required class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold transition-colors outline-none cursor-pointer appearance-none">
+                                            <option value="" disabled selected>تکایە هەڵبژێرە...</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700">ڕووبەر (مەتر دووجا) <span class="text-red-500">*</span></label>
+                                    <div class="relative group">
+                                        <i class="fas fa-ruler-combined absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                        <input type="number" id="areaInput" required min="1" placeholder="بۆ نمونە: 45" class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold transition-colors outline-none" dir="ltr">
+                                    </div>
+                                </div>
+                                
+                                <!-- Dynamic Receipt Preview -->
+                                <div class="mt-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="text-gray-500 font-bold">نرخی یەک مەتر</span>
+                                        <span id="retailPricePreview" class="text-gray-900 font-black font-mono">0.00$</span>
+                                    </div>
+                                    <div class="flex justify-between items-center mb-4 pb-4 border-b border-dashed border-gray-200">
+                                        <span class="text-gray-500 font-bold">کۆی گشتی ڕووبەر</span>
+                                        <span id="retailAreaPreview" class="text-gray-900 font-black font-mono">0 m²</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-wood-600 font-black text-lg">کۆی گشتی نرخ</span>
+                                        <span id="retailTotalPreview" class="text-wood-600 font-black text-2xl font-mono">0.00$</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Side: Customer Info -->
+                        <div class="w-full xl:w-3/5 p-8 md:p-12 relative bg-white">
+                            <h3 class="text-2xl font-black mb-8 text-gray-900 flex items-center"><i class="fas fa-user-circle text-wood-500 ml-3 text-3xl"></i> زانیاری کڕیار</h3>
+                            <div class="space-y-8">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-gray-700">ناوی تەواو <span class="text-red-500">*</span></label>
+                                        <div class="relative group">
+                                            <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                            <input type="text" id="nameInput" required placeholder="ناوی سیانیت بنووسە" class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 font-medium transition-colors outline-none">
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-gray-700">مۆبایل <span class="text-red-500">*</span></label>
+                                        <div class="relative group">
+                                            <i class="fas fa-phone absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                            <input type="tel" id="phoneInput" required placeholder="0750 000 0000" dir="ltr" class="w-full pl-12 pr-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 text-left font-bold transition-colors outline-none">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700">ناونیشانی تەواو <span class="text-red-500">*</span></label>
+                                    <div class="relative group">
+                                        <i class="fas fa-map-marker-alt absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                        <input type="text" id="addressInput" required placeholder="شار، گەڕەک، کۆڵان..." class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 font-medium transition-colors outline-none">
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-end">
+                                        <label class="block text-sm font-bold text-gray-700">دیاریکردنی شوێن لەسەر نەخشە <span class="text-red-500">*</span></label>
+                                        <span class="text-xs text-gray-500 font-medium"><i class="fas fa-info-circle"></i> مارکەرەکە ڕابکێشە</span>
+                                    </div>
+                                    <div class="p-1.5 bg-gray-100 rounded-2xl shadow-inner border border-gray-200"><div id="map" class="rounded-xl overflow-hidden shadow-sm" style="height: 350px; width: 100%; border:none;"></div></div>
+                                    <input type="hidden" id="latInput" required><input type="hidden" id="lngInput" required>
+                                </div>
+                                
+                                <div class="pt-4">
+                                    <button type="submit" id="submitBtn" class="w-full py-5 rounded-xl font-black text-white bg-gradient-to-l from-wood-600 to-wood-800 hover:from-wood-700 hover:to-wood-900 shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 flex justify-center items-center gap-3 text-xl pulse-btn">
+                                        <i class="fab fa-telegram-plane text-2xl"></i> ناردنی داواکاری بۆ کۆمپانیا
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer id="site-footer" class="bg-wood-950 text-white py-16 text-center border-t-[8px] border-gold-500 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-5" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');"></div>
+            <div class="relative z-10 flex flex-col items-center justify-center">
+                <img src="/assets/logo-BO_EXJtV.png" alt="Zone Parquet" class="w-20 h-20 rounded-2xl object-contain mb-6 shadow-lg border border-wood-700 bg-white p-1">
+                <h3 class="text-3xl font-black mb-3 tracking-tight">Zone <span class="text-gold-500">Parquet</span></h3>
+                <p class="text-wood-400 text-sm font-medium max-w-md mx-auto leading-relaxed"><span data-i18n="footer_desc">باشترین جۆرەکانی پارکێت بە گەرەنتی و کوالیتی بەرز بۆ ماڵ و شوێنی کارەکەت.</span></p>
+                <div class="w-24 h-px bg-wood-800 my-8"></div>
+                <p class="text-wood-500 text-sm font-bold"><span data-i18n="footer_copy">&copy; 2026 گشت مافەکانی پارێزراوە بۆ زۆن پارکێت.</span></p>
+            </div>
+        </footer>
+    </div>
+
+
+    <div id="wholesale-app" class="hidden">
+        <header id="wholesale-site-header" class="bg-white/85 backdrop-blur-xl shadow-sm sticky top-0 z-40 transition-all border-b border-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center">
+                        <a href="#" id="wholesale-brand-logo" class="flex items-center gap-3 group cursor-pointer select-none" title="Zone Parquet">
+                            <img src="/assets/logo-BO_EXJtV.png" alt="Zone Parquet" class="w-12 h-12 rounded-xl object-contain shadow-lg transition-transform group-hover:scale-105 border border-wood-500/30 bg-white">
+                            <div class="flex flex-col">
+                                <span class="font-black text-2xl tracking-tight text-gold-500 leading-none">Zone <span class="text-gold-400">Wholesale</span></span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="relative bg-gray-50 border border-gray-200 rounded-xl overflow-hidden flex items-center px-2 py-1 shadow-sm">
+                            <i class="fas fa-globe text-gray-400 text-sm ml-2 mr-2"></i>
+                            <select id="langSwitcher" onchange="changeLanguage(this.value)" class="bg-transparent text-gray-700 text-sm font-bold focus:outline-none appearance-none cursor-pointer py-1 pr-6 pl-2" dir="ltr">
+                                <option value="ku" selected>کوردی</option>
+                                <option value="en">English</option>
+                                <option value="ar">العربية</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-2 text-[10px] text-gray-400 pointer-events-none"></i>
+                        </div>
+                        <nav id="main-nav" class="hidden md:flex space-x-8 space-x-reverse items-center">
+                            <a href="#catalog" class="text-gray-600 hover:text-wood-600 font-bold transition" data-i18n="nav_catalog">کەتەلۆگ</a>
+                            <a href="#order" class="px-6 py-2.5 rounded-full bg-wood-900 text-white font-bold hover:bg-wood-800 transition shadow-md hover:shadow-lg" data-i18n="nav_order">داواکردن</a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Hero -->
+            <section class="relative bg-wood-900 overflow-hidden text-white py-28 lg:py-40 flex flex-col items-center text-center">
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover opacity-20 mix-blend-luminosity">
+                    <div class="absolute inset-0 bg-gradient-to-t from-wood-950 via-wood-900/60 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-wood-900/80 via-transparent to-transparent"></div>
+                </div>
+                <div class="relative z-10 max-w-5xl mx-auto px-4">
+                    <div class="inline-block px-4 py-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400 font-bold text-sm mb-6 fade-in-up backdrop-blur-md shadow-glass"><span data-i18n="hero_badge">بەرزترین کوالیتی پارکێت لە کوردستان</span></div>
+                    <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 fade-in-up" style="animation-delay: 0.1s; line-height: 1.2;">
+                        <span data-i18n="hero_title_1">جوانی و سروشت بۆ</span> <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-wood-300"><span data-i18n="hero_title_2">ناوەوەی ماڵەکەت</span></span>
+                    </h1>
+                    <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto fade-in-up font-medium" style="animation-delay: 0.2s;">
+                        <span data-i18n="hero_desc">بەرزترین ئاستی پارکێت، دژە ئاو، ڕەنگی نەگۆڕ و ستایلی سەردەمیانە. ئێستا جۆرەکان ببینە و ڕاستەوخۆ داوای بکە بۆ گەیاندن.</span>
+                    </p>
+                    <div class="mt-10 fade-in-up" style="animation-delay: 0.3s;">
+                        <a href="#catalog" class="px-8 py-4 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-gold-500 font-black text-lg hover:shadow-glow transition pulse-btn inline-flex items-center gap-2">
+                            <span data-i18n="hero_btn">بینینی کەتەلۆگ</span> <i class="fas fa-arrow-down"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Catalog -->
+            <section id="catalog" class="py-24 bg-gray-50 relative">
+                <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col mb-16 gap-6">
+                        <div class="text-center md:text-right">
+                            <h2 class="text-4xl font-black text-gray-900 mb-3"><span data-i18n="cat_title">کەتەلۆگی بەرهەمەکان</span></h2>
+                            <p class="text-gray-500 font-medium"><span data-i18n="cat_desc">جۆرە جیاوازەکانی پارکێت بە قیاس و ڕەنگی جیاواز</span></p>
+                        </div>
+                        <!-- Premium Category Scroll -->
+                        <div class="w-full overflow-x-auto pb-4 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+                            <div class="flex items-center gap-3 w-max" id="wholesaleCategoryTabs">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Secondary Filters -->
+                        <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between z-20 relative w-full">
+                            <div class="flex items-center gap-2 text-wood-500 font-black text-lg px-2 hidden xl:flex">
+                                <i class="fas fa-sliders-h"></i> فلتەری زیاتر
+                            </div>
+                            <div class="flex flex-wrap gap-3 items-center justify-center w-full xl:w-auto">
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-sort-amount-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                    <select id="sortPriceWhole" onchange="window.applyWholesaleFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-wood-300 rounded-xl text-sm font-bold outline-none focus:border-wood-500 transition-colors cursor-pointer appearance-none">
+                                        <option value="">ڕیزکردنی نرخ</option>
+                                        <option value="asc">کەمترین بۆ بەرزترین</option>
+                                        <option value="desc">بەرزترین بۆ کەمترین</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="relative group w-full sm:w-auto flex-1 sm:flex-none">
+                                    <i class="fas fa-globe absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                    <select id="filterCountryWhole" onchange="window.applyWholesaleFilters()" class="w-full pr-12 pl-8 py-3 bg-gray-50 border-2 border-gray-100 hover:border-wood-300 rounded-xl text-sm font-bold outline-none focus:border-wood-500 transition-colors cursor-pointer appearance-none">
+                                        <option value="">هەموو وڵاتێک</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border-2 border-gray-100 focus-within:border-wood-500 transition-colors hover:border-wood-300 w-full sm:w-auto justify-center">
+                                    <input type="number" id="minPriceWhole" placeholder="کەمترین $" oninput="window.applyWholesaleFilters()" class="w-24 bg-white px-3 py-2 rounded-lg text-sm font-bold outline-none text-center shadow-sm" dir="ltr">
+                                    <span class="text-gray-400 font-black">-</span>
+                                    <input type="number" id="maxPriceWhole" placeholder="بەرزترین $" oninput="window.applyWholesaleFilters()" class="w-24 bg-white px-3 py-2 rounded-lg text-sm font-bold outline-none text-center shadow-sm" dir="ltr">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div id="catalog-loading" class="text-center py-20">
+                        <div class="w-16 h-16 border-4 border-wood-200 border-t-wood-600 rounded-full animate-spin mx-auto mb-6"></div>
+                        <p class="text-gray-500 font-bold text-lg"><span data-i18n="cat_loading">خەریکی هێنانی زانیارییەکان...</span></p>
+                    </div>
+
+                    <!-- Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 hidden" id="product-grid"></div>
+                    
+                    <!-- Empty State -->
+                    <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+                        <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-2xl font-bold text-gray-600"><span data-i18n="cat_empty">هیچ بەرهەمێک لە کەتەلۆگدا نییە.</span></h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Order Form -->
+            <section id="wOrder" class="py-24 bg-white relative">
+                <div class="max-w-5xl mx-auto px-4 relative z-10">
+                    <div class="bg-white rounded-[2.5rem] shadow-premium overflow-hidden border border-gray-100 relative">
+                        <!-- Decor -->
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-wood-100 rounded-full blur-3xl -mr-32 -mt-32 z-0 opacity-50"></div>
+                        <div class="absolute bottom-0 left-0 w-64 h-64 bg-gold-50 rounded-full blur-3xl -ml-32 -mb-32 z-0 opacity-50"></div>
+                        
+                        <div class="bg-gradient-to-r from-wood-950 to-wood-800 text-white p-10 md:p-14 text-center relative z-10 overflow-hidden">
+                            <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');"></div>
+                            <h2 class="text-4xl font-black mb-4 relative z-10"><span data-i18n="order_title">فۆڕمی داواکاری پڕۆفیشناڵ</span></h2>
+                            <p class="text-wood-300 font-medium relative z-10 max-w-lg mx-auto"><span data-i18n="order_desc">زانیارییەکانت بە وردی پڕبکەرەوە، تیمی ئێمە لە کەمترین کاتدا پەیوەندیت پێوە دەکەن.</span></p>
+                        </div>
+                    <form id="wholesaleOrderForm" class="bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100 relative flex flex-col xl:flex-row">
+                        <!-- Left Side: Order Details & Total (Receipt style) -->
+                        <div class="w-full xl:w-2/5 bg-gray-50 p-8 md:p-12 relative border-b xl:border-b-0 xl:border-l border-gray-200">
+                            <!-- Decor inside left side -->
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-wood-100 rounded-bl-[100px] opacity-40 -mr-4 -mt-4"></div>
+                            <h3 class="text-2xl font-black mb-8 text-gray-900 relative z-10 flex items-center"><i class="fas fa-receipt text-wood-500 ml-3 text-3xl"></i> زانیاری داواکاری</h3>
+                            
+                            <div class="space-y-6 relative z-10">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700">جۆری پارکێت <span class="text-red-500">*</span></label>
+                                    <div class="relative group">
+                                        <i class="fas fa-box absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                        <select id="wProductSelect" required class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold transition-colors outline-none cursor-pointer appearance-none">
+                                            <option value="" disabled selected>تکایە هەڵبژێرە...</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700">ڕووبەر (مەتر دووجا) <span class="text-red-500">*</span></label>
+                                    <div class="relative group">
+                                        <i class="fas fa-ruler-combined absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                        <input type="number" id="wAreaInput" required min="1" placeholder="بۆ نمونە: 45" class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold transition-colors outline-none" dir="ltr">
+                                    </div>
+                                </div>
+                                
+                                <!-- Dynamic Receipt Preview -->
+                                <div class="mt-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="text-gray-500 font-bold">نرخی یەک مەتر</span>
+                                        <span id="wholePricePreview" class="text-gray-900 font-black font-mono">0.00$</span>
+                                    </div>
+                                    <div class="flex justify-between items-center mb-4 pb-4 border-b border-dashed border-gray-200">
+                                        <span class="text-gray-500 font-bold">کۆی گشتی ڕووبەر</span>
+                                        <span id="wholeAreaPreview" class="text-gray-900 font-black font-mono">0 m²</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gold-600 font-black text-lg">کۆی گشتی نرخ</span>
+                                        <span id="wholeTotalPreview" class="text-gold-600 font-black text-2xl font-mono">0.00$</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Side: Customer Info -->
+                        <div class="w-full xl:w-3/5 p-8 md:p-12 relative bg-white">
+                            <h3 class="text-2xl font-black mb-8 text-gray-900 flex items-center"><i class="fas fa-user-circle text-wood-500 ml-3 text-3xl"></i> زانیاری کڕیار</h3>
+                            <div class="space-y-8">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-gray-700">ناوی تەواو <span class="text-red-500">*</span></label>
+                                        <div class="relative group">
+                                            <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                            <input type="text" id="wNameInput" required placeholder="ناوی سیانیت بنووسە" class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 font-medium transition-colors outline-none">
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="block text-sm font-bold text-gray-700">مۆبایل <span class="text-red-500">*</span></label>
+                                        <div class="relative group">
+                                            <i class="fas fa-phone absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                            <input type="tel" id="wPhoneInput" required placeholder="0750 000 0000" dir="ltr" class="w-full pl-12 pr-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 text-left font-bold transition-colors outline-none">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700">ناونیشانی تەواو <span class="text-red-500">*</span></label>
+                                    <div class="relative group">
+                                        <i class="fas fa-map-marker-alt absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                                        <input type="text" id="wAddressInput" required placeholder="شار، گەڕەک، کۆڵان..." class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 font-medium transition-colors outline-none">
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-end">
+                                        <label class="block text-sm font-bold text-gray-700">دیاریکردنی شوێن لەسەر نەخشە <span class="text-red-500">*</span></label>
+                                        <span class="text-xs text-gray-500 font-medium"><i class="fas fa-info-circle"></i> مارکەرەکە ڕابکێشە</span>
+                                    </div>
+                                    <div class="p-1.5 bg-gray-100 rounded-2xl shadow-inner border border-gray-200"><div id="wMap" class="rounded-xl overflow-hidden shadow-sm" style="height: 350px; width: 100%; border:none;"></div></div>
+                                    <input type="hidden" id="wLatInput" required><input type="hidden" id="wLngInput" required>
+                                </div>
+                                
+                                <div class="pt-4">
+                                    <button type="submit" id="wSubmitBtn" class="w-full py-5 rounded-xl font-black text-wood-900 bg-gradient-to-r from-gold-400 to-gold-500 shadow-xl shadow-gold-500/30 hover:shadow-2xl transition-all transform hover:-translate-y-1 flex justify-center items-center gap-3 text-xl pulse-btn border border-gold-300">
+                                        <i class="fab fa-telegram-plane text-2xl"></i> ناردنی داواکاری بۆ کۆمپانیا
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer id="site-footer" class="bg-wood-950 text-white pt-16 pb-28 md:pb-16 text-center border-t-[8px] border-gold-500 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-5" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');"></div>
+            <div class="relative z-10 flex flex-col items-center justify-center">
+                <img src="/assets/logo-BO_EXJtV.png" alt="Zone Parquet" class="w-20 h-20 rounded-2xl object-contain mb-6 shadow-lg border border-wood-700 bg-white p-1">
+                <h3 class="text-3xl font-black mb-3 tracking-tight">Zone <span class="text-gold-500">Parquet</span></h3>
+                <p class="text-wood-400 text-sm font-medium max-w-md mx-auto leading-relaxed"><span data-i18n="footer_desc">باشترین جۆرەکانی پارکێت بە گەرەنتی و کوالیتی بەرز بۆ ماڵ و شوێنی کارەکەت.</span></p>
+                <div class="w-24 h-px bg-wood-800 my-8"></div>
+                <p class="text-gold-400 text-sm font-bold"><span data-i18n="footer_copy">&copy; 2026 گشت مافەکانی پارێزراوە بۆ زۆن پارکێت.</span></p>
+            </div>
+        </footer>
+
+        <!-- Public Mobile Bottom Nav Removed -->
+    </div>
+
+
+    
+
+    <!-- ==================== ADMIN LOGIN ==================== -->
+    <div id="admin-login-app" class="hidden min-h-screen bg-wood-50 flex items-center justify-center p-4 relative">
+        <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');"></div>
+        
+        <div class="max-w-md w-full glass-panel rounded-[2.5rem] shadow-2xl p-10 relative overflow-hidden z-10">
+            <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-wood-500 via-gold-500 to-wood-900"></div>
+            
+            <div class="text-center mb-10 mt-2">
+                <div class="w-20 h-20 bg-gradient-to-br from-wood-800 to-wood-950 rounded-[1.5rem] mx-auto flex items-center justify-center text-gold-400 font-bold text-3xl mb-5 shadow-xl shadow-wood-900/30 border border-wood-600/50">
+                    <i class="fas fa-lock text-2xl"></i>
+                </div>
+                <h2 id="authTitle" class="text-2xl font-black text-gray-900">چوونە ژوورەوەی بەڕێوەبەر</h2>
+                <p id="authSubtitle" class="text-gray-500 text-sm mt-2 font-medium">زانیارییەکانی فایەربەیسەکەت داخڵ بکە</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">ئیمەیڵ</label>
+                    <div class="relative group">
+                        <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                        <input type="email" id="loginEmail" required class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 focus:ring-4 focus:ring-wood-500/20 outline-none bg-white transition-all text-left font-medium shadow-sm" dir="ltr" placeholder="admin@zoneparquet.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">تێپەڕەوشە (پاسۆرد)</label>
+                    <div class="relative group">
+                        <i class="fas fa-key absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+                        <input type="password" id="loginPassword" required class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 focus:ring-4 focus:ring-wood-500/20 outline-none bg-white transition-all text-left font-medium shadow-sm" dir="ltr" placeholder="••••••••">
+                    </div>
+                </div>
+                <button type="submit" id="loginBtn" class="w-full py-4 mt-2 rounded-2xl font-black text-white bg-gradient-to-l from-wood-700 to-wood-900 hover:from-wood-800 hover:to-wood-950 shadow-xl shadow-wood-900/30 transition-all transform hover:-translate-y-1 flex justify-center items-center gap-2">
+                    <span id="loginBtnText">چوونە ناو سیستەم</span> <i class="fas fa-sign-in-alt"></i>
+                </button>
+                
+                <div class="flex flex-col gap-3 mt-6 pt-6 border-t border-gray-200">
+                    <button type="button" onclick="window.location.hash=''" class="w-full py-3 rounded-xl font-bold text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors text-sm flex items-center justify-center gap-2">
+                        <i class="fas fa-arrow-right"></i> گەڕانەوە بۆ کەتەلۆگ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== ADMIN DASHBOARD ==================== -->
+    <div id="admin-dashboard-app" class="hidden min-h-screen bg-[#F4F4F5] flex-col md:flex-row print-hide font-medium">
+        
+        <!-- Sidebar (Raqi Design) -->
+        <aside class="hidden md:flex md:w-[320px] bg-[#1a1310] text-white flex-col shadow-2xl z-20 relative overflow-hidden border-l border-white/5">
+            <div class="absolute inset-0 opacity-5" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png'); pointer-events: none;"></div>
+            
+            <div class="p-8 flex items-center gap-4 relative z-10">
+                <img src="/assets/logo-BO_EXJtV.png" alt="Zone Parquet" class="w-14 h-14 rounded-2xl object-contain shadow-glow border border-gold-300 bg-white p-1">
+                <div>
+                    <span class="font-black text-2xl block leading-tight tracking-wide">زۆن پارکێت</span>
+                    <span class="text-gold-400 text-xs font-bold uppercase tracking-widest mt-1 block">پەنجەرەی بەڕێوەبەر</span>
+                </div>
+            </div>
+
+            <div class="px-8 pb-4 relative z-10">
+                <div class="h-px bg-gradient-to-r from-wood-800 via-wood-600 to-wood-800 w-full"></div>
+            </div>
+
+            <nav class="p-5 flex-grow space-y-3 relative z-10">
+                <button onclick="switchAdminTab('dashboard')" id="nav-dashboard" class="w-full text-right px-6 py-4 rounded-2xl bg-white/10 text-white border border-white/10 font-bold transition-all flex items-center gap-4 shadow-glass hover:bg-white/15">
+                    <div class="w-10 h-10 rounded-xl bg-wood-800 flex items-center justify-center"><i class="fas fa-chart-pie text-gold-400 text-lg"></i></div> 
+                    داشبۆرد و ئامارەکان
+                </button>
+                <button onclick="switchAdminTab('products')" id="nav-products" class="w-full text-right px-6 py-4 rounded-2xl text-wood-400 hover:text-white hover:bg-white/5 font-bold transition-all flex items-center gap-4 border border-transparent">
+                    <div class="w-10 h-10 rounded-xl bg-wood-900/50 flex items-center justify-center border border-wood-800"><i class="fas fa-boxes text-gray-400 text-lg"></i></div> 
+                    کەتەلۆگ و بەرهەمەکان
+                </button>
+                <button onclick="switchAdminTab('invoice')" id="nav-invoice" class="w-full text-right px-6 py-4 rounded-2xl text-wood-400 hover:text-white hover:bg-white/5 font-bold transition-all flex items-center gap-4 border border-transparent">
+                    <div class="w-10 h-10 rounded-xl bg-wood-900/50 flex items-center justify-center border border-wood-800"><i class="fas fa-file-invoice-dollar text-gray-400 text-lg"></i></div> 
+                    دروستکردنی وەسڵ
+                </button>
+                <button onclick="switchAdminTab('orders')" id="nav-orders" class="w-full text-right px-6 py-4 rounded-2xl text-wood-400 hover:text-white hover:bg-white/5 font-bold transition-all flex items-center gap-4 border border-transparent">
+                    <div class="w-10 h-10 rounded-xl bg-wood-900/50 flex items-center justify-center border border-wood-800"><i class="fas fa-shopping-bag text-gray-400 text-lg"></i></div> 
+                    داواکارییەکان
+                </button>
+                <button onclick="switchAdminTab('users')" id="nav-users" class="w-full text-right px-6 py-4 rounded-2xl text-wood-400 hover:text-white hover:bg-white/5 font-bold transition-all flex items-center gap-4 border border-transparent">
+                    <div class="w-10 h-10 rounded-xl bg-wood-900/50 flex items-center justify-center border border-wood-800"><i class="fas fa-users text-gray-400 text-lg"></i></div> 
+                    بەکارهێنەران
+                </button>
+                <button onclick="switchAdminTab('expenses')" id="nav-expenses" class="w-full text-right px-6 py-4 rounded-2xl text-wood-400 hover:text-white hover:bg-white/5 font-bold transition-all flex items-center gap-4 border border-transparent">
+                    <div class="w-10 h-10 rounded-xl bg-wood-900/50 flex items-center justify-center border border-wood-800"><i class="fas fa-wallet text-gray-400 text-lg"></i></div> 
+                    خەرجییەکان
+                </button>
+                <button onclick="switchAdminTab('settings')" id="nav-settings" class="w-full text-right px-6 py-4 rounded-2xl text-wood-400 hover:text-white hover:bg-white/5 font-bold transition-all flex items-center gap-4 border border-transparent">
+                    <div class="w-10 h-10 rounded-xl bg-wood-900/50 flex items-center justify-center border border-wood-800"><i class="fas fa-cog text-gray-400 text-lg"></i></div> 
+                    ڕێکخستن و باکئەپ
+                </button>
+                
+                <div class="my-8 pt-8 border-t border-wood-800">
+                    <a href="#" onclick="window.location.hash=''" class="w-full text-right px-6 py-4 rounded-2xl text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 font-bold transition-all flex items-center gap-4 border border-transparent">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20"><i class="fas fa-external-link-alt text-lg"></i></div> 
+                        بینینی ماڵپەڕ ڕاستەوخۆ
+                    </a>
+                </div>
+            </nav>
+            <div class="p-6 relative z-10">
+                <button id="logoutBtn" class="w-full py-4 bg-red-500/10 text-red-400 rounded-2xl font-bold hover:bg-red-500 hover:text-white transition-all border border-red-500/20 hover:border-red-500 flex justify-center items-center gap-2 shadow-sm">
+                    <i class="fas fa-sign-out-alt"></i> چوونە دەرەوە
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-grow h-screen overflow-y-auto custom-scrollbar relative md:pb-0 pb-24">
+            
+            <!-- Admin Topbar -->
+            <div class="bg-white/80 backdrop-blur-md border-b border-gray-200 px-8 py-5 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+                <div>
+                    <h2 class="text-xl font-black text-gray-800">بەخێربێیتەوە بەڕێوەبەر 👋</h2>
+                    <p class="text-sm text-gray-500 font-bold mt-1" id="currentDateDisplay"></p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button id="notificationBell" class="relative w-12 h-12 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center border border-gray-200 text-gray-600 transition-colors shadow-sm pulse-btn" onclick="window.requestNotificationPermission()">
+                        <i class="fas fa-bell text-xl" id="bellIcon"></i>
+                        <span id="notificationBadge" class="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-white rounded-full hidden"></span>
+                    </button>
+                    <div class="w-12 h-12 bg-wood-100 rounded-full flex items-center justify-center border-2 border-wood-200 text-wood-600 shadow-sm">
+                        <i class="fas fa-user-shield text-xl"></i>
+                    </div>
+                    <!-- Mobile Logout Button -->
+                    <button onclick="document.getElementById('logoutBtn').click()" class="md:hidden w-12 h-12 bg-red-50 hover:bg-red-100 rounded-full flex items-center justify-center border border-red-200 text-red-500 transition-colors shadow-sm">
+                        <i class="fas fa-sign-out-alt text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-10">
+                
+                <!-- Dashboard Tab -->
+                <div id="tab-dashboard" class="block fade-in-up">
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-chart-pie"></i></div>
+                            <div>
+                                <h2 class="text-3xl font-black text-gray-900">داشبۆردی ئامارەکان</h2>
+                                <p class="text-gray-500 font-medium mt-1">پوختەی کارەکان و قازانجەکان بە یەک سەیرکردن.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
+                        <!-- Total Orders -->
+                        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-[100%] z-0 transition-transform group-hover:scale-110"></div>
+                            <div class="relative z-10 flex justify-between items-start mb-4">
+                                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl"><i class="fas fa-shopping-cart"></i></div>
+                            </div>
+                            <h3 class="text-gray-500 font-bold mb-1 relative z-10">کۆی داواکاری</h3>
+                            <p class="text-3xl font-black text-gray-900 relative z-10" id="dashTotalOrders">0</p>
+                        </div>
+                        
+                        <!-- Completed Orders -->
+                        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-bl-[100%] z-0 transition-transform group-hover:scale-110"></div>
+                            <div class="relative z-10 flex justify-between items-start mb-4">
+                                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-xl"><i class="fas fa-check-circle"></i></div>
+                            </div>
+                            <h3 class="text-gray-500 font-bold mb-1 relative z-10">فرۆشراو</h3>
+                            <p class="text-3xl font-black text-gray-900 relative z-10" id="dashCompletedOrders">0</p>
+                        </div>
+
+                        <!-- Pending Orders -->
+                        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-orange-50 rounded-bl-[100%] z-0 transition-transform group-hover:scale-110"></div>
+                            <div class="relative z-10 flex justify-between items-start mb-4">
+                                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div>
+                            </div>
+                            <h3 class="text-gray-500 font-bold mb-1 relative z-10">چاوەڕوانکراو</h3>
+                            <p class="text-3xl font-black text-gray-900 relative z-10" id="dashPendingOrders">0</p>
+                        </div>
+
+                        <!-- Revenue -->
+                        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-gold-50 rounded-bl-[100%] z-0 transition-transform group-hover:scale-110"></div>
+                            <div class="relative z-10 flex justify-between items-start mb-4">
+                                <div class="w-12 h-12 bg-gold-100 text-gold-600 rounded-xl flex items-center justify-center text-xl"><i class="fas fa-dollar-sign"></i></div>
+                            </div>
+                            <h3 class="text-gray-500 font-bold mb-1 relative z-10">کۆی داهات</h3>
+                            <p class="text-3xl font-black text-wood-800 relative z-10" id="dashTotalRevenue">$0.00</p>
+                        </div>
+
+                        <!-- Gross Profit -->
+                        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-[100%] z-0 transition-transform group-hover:scale-110"></div>
+                            <div class="flex items-center gap-3 mb-4 relative z-10">
+                                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fas fa-hand-holding-usd"></i></div>
+                                <h3 class="text-gray-500 font-bold text-sm">قازانج (خێر لێدەرنەکراو)</h3>
+                            </div>
+                            <p class="text-3xl font-black text-blue-600 relative z-10" id="dashGrossProfit">$0.00</p>
+                        </div>
+
+                        <!-- Expenses -->
+                        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-red-50 rounded-bl-[100%] z-0 transition-transform group-hover:scale-110"></div>
+                            <div class="flex items-center gap-3 mb-4 relative z-10">
+                                <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center"><i class="fas fa-wallet"></i></div>
+                                <h3 class="text-gray-500 font-bold text-sm">کۆی خەرجییەکان</h3>
+                            </div>
+                            <p class="text-3xl font-black text-red-600 relative z-10" id="dashTotalExpensesCard">$0.00</p>
+                        </div>
+
+                        <!-- Net Profit -->
+                        <div class="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-green-200 flex flex-col relative overflow-hidden group bg-gradient-to-br from-white to-green-50/30 lg:col-span-2 xl:col-span-1">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-green-100/50 rounded-bl-[100%] z-0 transition-transform group-hover:scale-110"></div>
+                            <div class="relative z-10 flex justify-between items-start mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shadow-green-500/30"><i class="fas fa-chart-line"></i></div>
+                            </div>
+                            <h3 class="text-green-700 font-black mb-1 relative z-10">پوختەی قازانج (خێر)</h3>
+                            <p class="text-3xl font-black text-green-600 relative z-10" id="dashTotalProfit">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Tab -->
+                <div id="tab-categories" class="hidden fade-in-up">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-3xl font-black text-white">پۆلێنەکان (Categories)</h2>
+                            <p class="text-wood-400 mt-2 font-bold">زیادکردن و سڕینەوەی پۆلێنی بەرهەمەکان</p>
+                        </div>
+                        <button onclick="window.openCategoryModal()" class="bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600 text-wood-950 px-6 py-3 rounded-2xl font-black transition-all shadow-lg shadow-gold-500/20 transform hover:-translate-y-1 flex items-center gap-2">
+                            <i class="fas fa-plus"></i> پۆلێنی نوێ
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden min-h-[60vh] flex flex-col">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right border-collapse">
+                                <thead class="bg-gray-50/80 border-b border-gray-200 text-gray-500 text-sm">
+                                    <tr>
+                                        <th class="p-4 font-bold text-gray-800">ناوی پۆلێن (کوردی)</th>
+                                        <th class="p-4 font-bold text-gray-800" dir="ltr">Category Name</th>
+                                        <th class="p-4 text-center w-32 font-bold text-gray-800"><i class="fas fa-cog"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminCategoriesTable" class="divide-y divide-gray-100 font-medium">
+                                    <tr><td colspan="3" class="p-8 text-center text-gray-400 font-bold text-lg"><i class="fas fa-spinner fa-spin block text-3xl mb-2 text-gray-300"></i> بارکردن...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Tab -->
+                <div id="tab-products" class="hidden fade-in-up">
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                        <div class="bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 flex items-center gap-6 relative overflow-hidden group transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1">
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-wood-50 rounded-full z-0 transition-transform group-hover:scale-150"></div>
+                            <div class="w-16 h-16 bg-gradient-to-br from-wood-600 to-wood-800 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg relative z-10"><i class="fas fa-th-large"></i></div>
+                            <div class="relative z-10">
+                                <p class="text-gray-500 font-bold text-sm mb-1">کۆی بەرهەمەکان</p>
+                                <h3 class="text-3xl font-black text-gray-900" id="statTotalProducts">0</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 flex items-center gap-6 relative overflow-hidden group transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1">
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 rounded-full z-0 transition-transform group-hover:scale-150"></div>
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg relative z-10"><i class="fas fa-shield-alt"></i></div>
+                            <div class="relative z-10">
+                                <p class="text-gray-500 font-bold text-sm mb-1">پارکێتی دژە ئاو</p>
+                                <h3 class="text-3xl font-black text-gray-900" id="statWaterproof">0</h3>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 flex items-center gap-6 relative overflow-hidden group transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1">
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-green-50 rounded-full z-0 transition-transform group-hover:scale-150"></div>
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg relative z-10"><i class="fas fa-server"></i></div>
+                            <div class="relative z-10">
+                                <p class="text-gray-500 font-bold text-sm mb-1">دۆخی داتابەیس</p>
+                                <h3 class="text-xl font-black text-green-600 mt-1">ئۆنلاینە (چالاکە)</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Table Header -->
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                        <div>
+                            <h2 class="text-2xl font-black text-gray-900 flex items-center gap-3"><i class="fas fa-list-ul text-wood-500"></i> لیستی بەرهەمەکان لە کەتەلۆگ</h2>
+                        </div>
+                        <button onclick="openProductModal()" class="bg-gradient-to-r from-wood-800 to-wood-600 text-white px-6 py-3.5 rounded-2xl font-black shadow-lg hover:shadow-xl transition-all flex items-center gap-2 transform hover:-translate-y-1">
+                            <i class="fas fa-plus-circle text-xl"></i> زیادکردنی بەرهەمی نوێ
+                        </button>
+                    </div>
+
+                    <!-- Products Table Content -->
+                    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right border-collapse">
+                                <thead class="bg-gray-50/80 border-b border-gray-200 text-gray-500 text-sm">
+                                    <tr>
+                                        <th class="p-5 font-bold whitespace-nowrap w-24">وێنە</th>
+                                        <th class="p-5 font-bold whitespace-nowrap">کۆد / مۆدێل</th>
+                                        <th class="p-5 font-bold whitespace-nowrap">ناو و جۆر</th>
+                                        <th class="p-5 font-bold whitespace-nowrap">نرخی مەتر</th>
+                                        <th class="p-5 font-bold whitespace-nowrap">تایبەتمەندی</th>
+                                        <th class="p-5 font-bold text-center whitespace-nowrap w-32">کردارەکان</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminProductsTable" class="divide-y divide-gray-100 font-medium">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Tab -->
+                <div id="tab-invoice" class="hidden fade-in-up">
+                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8 flex items-center gap-4">
+                        <div class="w-14 h-14 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-file-invoice"></i></div>
+                        <div>
+                            <h2 class="text-3xl font-black text-gray-900"><span data-i18n="inv_title">دروستکردنی وەسڵی پڕۆفیشناڵ</span></h2>
+                            <p class="text-gray-500 font-medium mt-1"><span data-i18n="inv_desc">زانیارییەکانی کڕیار و بەرهەمەکان پڕبکەرەوە بۆ دەرکردنی وەسڵ.</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 md:p-12 max-w-5xl mx-auto">
+                        <form id="invoiceForm" class="space-y-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700" data-i18n="inv_name">ناوی کڕیار</label>
+                                    <input type="text" id="invName" required class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 focus:border-wood-500 bg-gray-50 outline-none transition-colors font-bold">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700" data-i18n="inv_phone">مۆبایل</label>
+                                    <input type="text" id="invPhone" class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 focus:border-wood-500 bg-gray-50 outline-none transition-colors font-bold" dir="ltr" placeholder="0750...">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700" data-i18n="inv_date">بەروار</label>
+                                    <input type="date" id="invDate" required class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 focus:border-wood-500 bg-gray-50 outline-none transition-colors font-bold text-gray-600">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-bold text-gray-700" data-i18n="inv_no">ژمارەی وەسڵ</label>
+                                    <input type="text" id="invNumber" value="INV-1001" class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 focus:border-wood-500 bg-gray-50 outline-none transition-colors font-black text-wood-600">
+                                </div>
+                            </div>
+
+                            <div class="h-px bg-gray-200"></div>
+
+                            <div class="bg-gray-50 p-8 rounded-[2rem] border border-gray-200 relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-2 h-full bg-wood-500"></div>
+                                <h4 class="font-black text-gray-800 mb-6 text-xl flex items-center gap-3"><i class="fas fa-shopping-cart text-wood-500 bg-white p-2 rounded-lg shadow-sm"></i> <span data-i18n="inv_add_item">زیادکردنی پارکێت بۆ ناو وەسڵەکە</span></h4>
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-end">
+                                    <div class="md:col-span-5 space-y-2">
+                                        <label class="block text-sm font-bold text-gray-700"><span data-i18n="inv_select">هەڵبژاردنی پارکێت لە کەتەلۆگ</span></label>
+                                        <select id="invProduct" class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold outline-none cursor-pointer">
+                                            <!-- populated dynamically -->
+                                        </select>
+                                    </div>
+                                    <div class="md:col-span-3 space-y-2">
+                                        <label class="block text-sm font-bold text-gray-700"><span data-i18n="inv_area">ڕووبەر (مەتر چوارگۆشە)</span></label>
+                                        <input type="number" id="invQty" value="1" min="0.1" step="0.1" class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-black outline-none text-center text-lg">
+                                    </div>
+                                    <div class="md:col-span-3 space-y-2">
+                                        <label class="block text-sm font-bold text-gray-700"><span data-i18n="inv_price">نرخی مەتر ($)</span></label>
+                                        <input type="number" id="invPrice" value="0" step="0.1" class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-black outline-none text-center text-lg text-wood-600">
+                                    </div>
+                                    <div class="md:col-span-1">
+                                        <button type="button" onclick="addInvoiceItem()" class="w-full h-[60px] bg-wood-600 text-white font-black rounded-2xl hover:bg-wood-700 shadow-md transition-all flex items-center justify-center text-2xl hover:scale-105">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Invoice Items Table -->
+                            <div class="overflow-hidden rounded-[2rem] border border-gray-200 shadow-sm">
+                                <table class="w-full text-right bg-white">
+                                    <thead class="bg-wood-900 text-white">
+                                        <tr>
+                                            <th class="p-5 font-bold text-lg" data-i18n="inv_tbl_desc">وەسفی کاڵا</th>
+                                            <th class="p-5 font-bold text-center text-lg" data-i18n="inv_tbl_area">ڕووبەر (m²)</th>
+                                            <th class="p-5 font-bold text-center text-lg" data-i18n="inv_tbl_price">نرخ ($)</th>
+                                            <th class="p-5 font-bold text-center text-lg" data-i18n="inv_tbl_total">کۆ ($)</th>
+                                            <th class="p-5 font-bold text-center text-lg" data-i18n="inv_tbl_del">سڕینەوە</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invItemsTable" class="divide-y divide-gray-100 font-medium">
+                                        <tr><td colspan="5" class="p-8 text-center text-gray-400 font-bold text-lg"><i class="fas fa-box-open block text-3xl mb-2 text-gray-300"></i> هیچ کاڵایەک زیاد نەکراوە</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="flex justify-end mt-6">
+                                <div class="bg-gradient-to-br from-wood-50 to-white p-8 rounded-[2rem] border-2 border-wood-200 min-w-[320px] shadow-sm flex flex-col items-center">
+                                    <span class="text-gray-500 font-bold mb-2 text-lg"><span data-i18n="inv_grand_total">کۆی گشتی پێویست (Total)</span></span>
+                                    <span id="invTotal" class="text-5xl font-black text-wood-800 tracking-tight">$0.00</span>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="generateAndPrintInvoice()" class="w-full py-6 mt-8 bg-gradient-to-r from-gold-500 to-gold-600 text-wood-900 font-black rounded-2xl text-2xl hover:shadow-glow transition-all flex justify-center items-center gap-4 pulse-btn">
+                                <i class="fas fa-print text-3xl"></i> <span data-i18n="inv_print_btn">دەرکردن و چاپکردنی وەسڵ</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Orders Tab -->
+                <div id="tab-orders" class="hidden fade-in-up">
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-shopping-bag"></i></div>
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-900">داواکارییەکان (Orders)</h2>
+                        <p class="text-gray-500 font-medium mt-1">ئەو داواکاریانەی لەلایەن کڕیارانەوە نێردراون.</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right border-collapse">
+                            <thead class="bg-gray-50/80 border-b border-gray-200 text-gray-500 text-sm">
+                                <tr>
+                                    <th class="p-5 font-bold whitespace-nowrap">کڕیار</th>
+                                    <th class="p-5 font-bold whitespace-nowrap">پەیوەندی</th>
+                                    <th class="p-5 font-bold whitespace-nowrap">پارکێت و ڕووبەر</th>
+                                    <th class="p-5 font-bold whitespace-nowrap">ناونیشان</th>
+                                    <th class="p-5 font-bold whitespace-nowrap">ڕێکەوت</th>
+                                    <th class="p-5 font-bold text-center whitespace-nowrap bg-green-50/50 text-green-700 border-x border-green-100">قازانج (خێر)</th>
+                                    <th class="p-5 font-bold text-center whitespace-nowrap">دۆخ/کردار</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminOrdersTable" class="divide-y divide-gray-100 font-medium">
+                                <tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold text-lg"><i class="fas fa-spinner fa-spin block text-3xl mb-2 text-gray-300"></i> خەریکی هێنانە...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="tab-users" class="hidden fade-in-up">
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-wood-100 text-wood-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-users"></i></div>
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-900">بەکارهێنەران (Users)</h2>
+                        <p class="text-gray-500 font-medium mt-1">لیستی هەژمارەکان و مۆڵەتی ئەدمین.</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right border-collapse">
+                            <thead class="bg-gray-50/80 border-b border-gray-200 text-gray-500 text-sm">
+                                <tr>
+                                    <th class="p-5 font-bold whitespace-nowrap">ئیمەیڵ</th>
+                                    <th class="p-5 font-bold whitespace-nowrap">ڕۆڵ (Role)</th>
+                                    <th class="p-5 font-bold whitespace-nowrap">ڕێکەوتی دروستکردن</th>
+                                    <th class="p-5 font-bold text-center whitespace-nowrap">کردار</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUsersTable" class="divide-y divide-gray-100 font-medium">
+                                <tr><td colspan="4" class="p-8 text-center text-gray-400 font-bold text-lg"><i class="fas fa-spinner fa-spin block text-3xl mb-2 text-gray-300"></i> خەریکی هێنانە...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expenses Tab -->
+            <div id="tab-expenses" class="hidden fade-in-up">
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-wallet"></i></div>
+                        <div>
+                            <h2 class="text-3xl font-black text-gray-900">بەشی خەرجییەکان</h2>
+                            <p class="text-gray-500 font-medium mt-1">تۆمارکردن و بەڕێوەبردنی خەرجییەکانی دوکان.</p>
+                        </div>
+                    </div>
+                    <button onclick="document.getElementById('addExpenseModal').classList.remove('hidden')" class="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 py-3.5 rounded-2xl font-black shadow-lg shadow-red-500/30 hover:shadow-xl transition-all flex items-center gap-2 transform hover:-translate-y-1">
+                        <i class="fas fa-plus-circle text-xl"></i> زیادکردنی خەرجی
+                    </button>
+                </div>
+                <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden min-h-[60vh] flex flex-col">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right border-collapse">
+                            <thead class="bg-gray-50/80 border-b border-gray-200 text-gray-500 text-sm">
+                                <tr>
+                                    <th class="p-5 font-bold whitespace-nowrap">ناوی خەرجی</th>
+                                    <th class="p-5 font-bold whitespace-nowrap">بڕی پارە ($)</th>
+                                    <th class="p-5 font-bold whitespace-nowrap">ڕێکەوت</th>
+                                    <th class="p-5 font-bold text-center whitespace-nowrap w-24">کردارەکان</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminExpensesTable" class="divide-y divide-gray-100 font-medium">
+                                <tr><td colspan="4" class="p-8 text-center text-gray-400 font-bold text-lg"><i class="fas fa-spinner fa-spin block text-3xl mb-2 text-gray-300"></i> خەریکی هێنانە...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="hidden fade-in-up">
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 mb-8 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-gray-100 text-gray-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-cog"></i></div>
+                    <div>
+                        <h2 class="text-3xl font-black text-gray-900">ڕێکخستنەکان و پاراستن</h2>
+                        <p class="text-gray-500 font-medium mt-1">باکئەپ و سڕینەوەی داتاکان.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 items-stretch">
+                    <!-- Exchange Rate Section (Full Width) -->
+                    <div class="md:col-span-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-[2rem] shadow-sm border border-blue-100 p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="flex items-center gap-6 relative z-10">
+                            <div class="w-20 h-20 bg-white text-blue-600 rounded-2xl flex items-center justify-center text-4xl shadow-md border border-blue-50"><i class="fas fa-money-bill-wave"></i></div>
+                            <div>
+                                <h3 class="text-2xl font-black text-gray-900 mb-1">نرخی دۆلار بەرامبەر دینار</h3>
+                                <p class="text-blue-600 font-bold text-sm">ئەم نرخە بەکاردێت بۆ نیشاندانی نرخی بەرهەمەکان بە دینار لە کەتەلۆگدا.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-3 rounded-2xl border-2 border-blue-100 shadow-sm relative z-10 w-full md:w-auto">
+                            <div class="font-black text-gray-400 text-xl pl-2 hidden sm:block">$100 =</div>
+                            <input type="number" id="exchangeRateInput" placeholder="150000" class="w-full sm:w-36 bg-gray-50 px-4 py-3 rounded-xl text-xl font-black outline-none text-center border border-gray-200 focus:border-blue-500 transition-colors text-blue-900" dir="ltr">
+                            <div class="font-black text-gray-400 text-lg pr-2 hidden sm:block">IQD</div>
+                            <button onclick="window.saveExchangeRate()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-blue-500/30 transition-all font-bold">
+                                <i class="fas fa-save"></i> پاشەکەوت
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Backup Section -->
+                    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col items-center text-center h-full">
+                        <div class="w-24 h-24 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-4xl mb-6"><i class="fas fa-cloud-download-alt"></i></div>
+                        <h3 class="text-2xl font-black text-gray-900 mb-2">دابەزاندنی باکئەپ (Backup)</h3>
+                        <p class="text-gray-500 mb-8 max-w-sm">هەموو زانیارییەکانت (بەرهەمەکان، داواکارییەکان، خەرجییەکان) بە سەلامەتی داونلۆد بکە بۆ ناو کۆمپیوتەرەکەت.</p>
+                        <button onclick="window.exportDataAsJSON()" class="w-full bg-gradient-to-r from-green-600 to-green-500 text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-green-500/30 hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3 text-lg">
+                            <i class="fas fa-download"></i> داونلۆدکردنی داتاکان
+                        </button>
+                    </div>
+
+                    <!-- Danger Zone Section -->
+                    <div class="bg-red-50/50 rounded-[2rem] shadow-[0_8px_30px_rgb(239,68,68,0.1)] border-2 border-red-100 p-8 flex flex-col h-full">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-exclamation-triangle"></i></div>
+                            <h3 class="text-2xl font-black text-red-700">ناوچەی مەترسیدار</h3>
+                        </div>
+                        <p class="text-red-600 mb-8 font-bold text-sm bg-red-100/50 p-4 rounded-xl">ئاگاداربە! هەر داتایەک لێرەوە بسڕیتەوە بە هیچ شێوەیەک ناگەڕێتەوە.</p>
+                        
+                        <div class="space-y-4 mt-auto">
+                            <button onclick="window.confirmAndDeleteCollection('orders', 'داواکارییەکان')" class="w-full bg-white text-red-600 hover:bg-red-600 hover:text-white border-2 border-red-200 px-6 py-4 rounded-xl font-bold transition-colors flex justify-between items-center group">
+                                <span>سڕینەوەی هەموو داواکارییەکان</span>
+                                <i class="fas fa-trash-alt opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            </button>
+                            <button onclick="window.confirmAndDeleteCollection('products', 'بەرهەمەکان')" class="w-full bg-white text-red-600 hover:bg-red-600 hover:text-white border-2 border-red-200 px-6 py-4 rounded-xl font-bold transition-colors flex justify-between items-center group">
+                                <span>سڕینەوەی هەموو بەرهەمەکان</span>
+                                <i class="fas fa-trash-alt opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            </button>
+                            <button onclick="window.confirmAndDeleteCollection('expenses', 'خەرجییەکان')" class="w-full bg-white text-red-600 hover:bg-red-600 hover:text-white border-2 border-red-200 px-6 py-4 rounded-xl font-bold transition-colors flex justify-between items-center group">
+                                <span>سڕینەوەی هەموو خەرجییەکان</span>
+                                <i class="fas fa-trash-alt opacity-50 group-hover:opacity-100 transition-opacity"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    </div>
+
+    <!-- Category Add Modal -->
+    <div id="categoryModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-wood-950/70 backdrop-blur-sm print-hide">
+        <div class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-8 transform transition-transform border border-white/20">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-gray-800">زیادکردنی پۆلێن</h3>
+                <button onclick="window.closeCategoryModal()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="categoryForm" class="space-y-5">
+                <input type="hidden" id="catDocId">
+                <div>
+                    <label class="block text-sm font-bold text-gray-500 mb-2">ناوی پۆلێن (بۆ نمونە: پاركێت، دەرگا)</label>
+                    <input type="text" id="catName" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-gold-400 transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-500 mb-2">Category Name (English)</label>
+                    <input type="text" id="catNameEn" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-5 py-4 font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-gold-400 transition-all text-left" dir="ltr" placeholder="e.g. Laminate, SPC">
+                </div>
+                <button type="submit" id="saveCategoryBtn" class="w-full bg-wood-800 hover:bg-wood-900 text-white font-bold py-4 rounded-xl transition-colors flex justify-center items-center gap-2 mt-4 text-lg">
+                    سەیڤ بکە <i class="fas fa-save"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Expense Add Modal -->
+    <div id="addExpenseModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-wood-950/70 backdrop-blur-sm print-hide">
+        <div class="bg-white w-full max-w-md rounded-[2rem] shadow-2xl p-8 transform transition-transform border border-white/20">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-gray-900 flex items-center gap-3"><i class="fas fa-wallet text-red-500"></i> خەرجییەکی نوێ</h3>
+                <button onclick="document.getElementById('addExpenseModal').classList.add('hidden')" class="w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 hover:text-red-500 transition-colors"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <form id="addExpenseForm" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-gray-700">ناوی خەرجی</label>
+                    <input type="text" id="expenseName" required placeholder="نموونە: کرێی دوکان، کارەبا..." class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 focus:border-red-400 bg-gray-50 outline-none font-bold transition-colors">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-gray-700">بڕی پارە ($)</label>
+                    <input type="number" id="expenseAmount" required step="0.1" placeholder="100.0" class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 focus:border-red-400 bg-gray-50 outline-none font-black text-red-600 text-lg transition-colors" dir="ltr">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-gray-700">ڕێکەوت</label>
+                    <input type="date" id="expenseDate" required class="w-full px-5 py-4 rounded-2xl border-2 border-gray-100 focus:border-red-400 bg-gray-50 outline-none font-bold text-gray-600 transition-colors">
+                </div>
+                <button type="submit" id="saveExpenseBtn" class="w-full bg-gradient-to-r from-red-600 to-red-500 text-white font-black py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3">
+                    <i class="fas fa-save text-xl"></i> پاشەکەوتکردن
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Add/Edit Modal (Admin) - RAQI DESIGN -->
+    <div id="adminProductModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-0 bg-wood-950/70 backdrop-blur-xl print-hide opacity-0 transition-opacity duration-400">
+        <div class="bg-white w-full max-w-none rounded-none shadow-[0_30px_60px_rgba(0,0,0,0.4)] border border-white/20 overflow-hidden relative transform scale-95 transition-transform duration-400 flex flex-col md:flex-row h-screen" id="adminModalContent">
+            
+            <!-- Left Side: Form -->
+            <div class="w-full md:w-2/3 flex flex-col h-full bg-white relative z-10 overflow-y-auto custom-scrollbar">
+                <div class="bg-white sticky top-0 z-20 px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+                    <h3 id="modalAdminTitle" class="text-2xl font-black text-gray-900 flex items-center gap-3"><i class="fas fa-layer-group text-wood-500"></i> زیادکردنی بەرهەمی نوێ</h3>
+                    <button onclick="closeAdminModal()" class="w-10 h-10 bg-gray-100 text-gray-600 rounded-full flex items-center justify-center hover:bg-gray-200 hover:text-red-500 transition-colors"><i class="fas fa-times text-lg"></i></button>
+                </div>
+                
+                <form id="adminProductForm" class="p-8 space-y-8">
+                    <input type="hidden" id="apDocId">
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-700">کۆد / مۆدێل</label>
+                            <div class="relative group">
+                                <i class="fas fa-barcode absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600"></i>
+                                <input type="text" id="apId" required placeholder="بۆ نمونە: ZP-101" class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors rounded-xl focus:border-wood-500 bg-gray-50 outline-none font-bold font-mono" dir="ltr">
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-700">ناوی پارکێت</label>
+                            <div class="relative group">
+                                <i class="fas fa-tag absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600"></i>
+                                <input type="text" id="apName" required placeholder="دار بەڕووی ئەڵمانی..." class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors rounded-xl focus:border-wood-500 bg-gray-50 outline-none font-bold">
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-700">پۆلێن (Category)</label>
+                            <div class="relative group">
+                                <i class="fas fa-tags absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600"></i>
+                                <select id="apCategory" required class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors rounded-xl focus:border-wood-500 bg-gray-50 outline-none font-bold appearance-none">
+                                    <option value="" disabled selected>پۆلێنێک هەڵبژێرە...</option>
+                                    <!-- Populated dynamically -->
+                                </select>
+                                <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-700">جۆری فرۆشتن</label>
+                            <div class="relative group">
+                                <i class="fas fa-store absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600"></i>
+                                <select id="apSellType" class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors rounded-xl focus:border-wood-500 bg-gray-50 outline-none font-bold appearance-none">
+                                    <option value="both">هەردووکیان (تاک و جۆملە)</option>
+                                    <option value="retail">تەنها تاک</option>
+                                    <option value="wholesale">تەنها جۆملە</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:col-span-2">
+                            <div class="space-y-2">
+                                <label class="block text-sm font-bold text-gray-700">نرخی فرۆشتن ($)</label>
+                                <div class="relative group">
+                                    <i class="fas fa-dollar-sign absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600"></i>
+                                    <input type="number" id="apPrice" required step="0.1" placeholder="20.0" class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors rounded-xl focus:border-wood-500 bg-gray-50 outline-none font-black text-wood-600 text-lg" dir="ltr">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-bold text-gray-700">نرخی جۆملە ($)</label>
+                                <div class="relative group">
+                                    <i class="fas fa-tags absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-gold-500"></i>
+                                    <input type="number" id="apWholesalePrice" step="0.1" placeholder="18.0" class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-gold-300 transition-colors rounded-xl focus:border-gold-500 bg-gold-50/30 outline-none font-black text-gold-600 text-lg" dir="ltr">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-bold text-gray-700">نرخی تێچوو ($)</label>
+                                <div class="relative group">
+                                    <i class="fas fa-hand-holding-usd absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-red-500"></i>
+                                    <input type="number" id="apCostPrice" required step="0.1" placeholder="15.0" class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-red-300 transition-colors rounded-xl focus:border-red-500 bg-red-50/30 outline-none font-black text-red-600 text-lg" dir="ltr">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-700">ئەستووری</label>
+                            <div class="relative group">
+                                <i class="fas fa-arrows-alt-v absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600"></i>
+                                <input type="text" id="apThickness" required placeholder="بۆ نمونە: 8mm" class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors rounded-xl focus:border-wood-500 bg-gray-50 outline-none font-bold" dir="ltr">
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-700">وڵاتی بەرهەمهێنەر</label>
+                            <div class="relative group">
+                                <i class="fas fa-globe absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600"></i>
+                                <input type="text" id="apCountry" required placeholder="ئەڵمانیا، تورکیا..." class="w-full pr-12 pl-4 py-3 border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors rounded-xl focus:border-wood-500 bg-gray-50 outline-none font-bold">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <label class="flex items-center gap-3 bg-blue-50/50 hover:bg-blue-50 border-2 border-blue-100 p-4 rounded-xl w-full cursor-pointer transition-colors">
+                                <input type="checkbox" id="apWaterproof" class="w-6 h-6 text-blue-600 rounded">
+                                <span class="font-black text-blue-800 flex items-center gap-2"><i class="fas fa-shield-alt"></i> تایبەتمەندی دژە ئاو (Waterproof)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                   <div class="space-y-2">
+                        <label class="block text-sm font-bold text-gray-700">وەسفی کورت بۆ کڕیار</label>
+                        <textarea id="apDesc" required rows="3" placeholder="تایبەتمەندییەکانی ئەم پارکێتە لێرە بنووسە..." class="w-full p-4 border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors rounded-xl focus:border-wood-500 bg-gray-50 outline-none font-medium leading-relaxed"></textarea>
+                    </div>
+
+                    <!-- Professional Features Section -->
+                    <div class="space-y-4 bg-gradient-to-br from-wood-50/80 to-white p-6 rounded-2xl border-2 border-wood-100 shadow-sm">
+                        <h4 class="font-black text-gray-800 flex items-center gap-2 mb-2"><i class="fas fa-gem text-wood-500"></i> تایبەتمەندییە پڕۆفیشناڵەکان</h4>
+                        <p class="text-xs text-gray-500 font-medium mb-4">هەر تایبەتمەندیەک ئایکۆنێکی پڕۆفیشناڵی هەیە. زیاد بکە بۆ نمایشکردنی لە کەتەلۆگدا.</p>
+                        
+                        <div id="featuresList" class="space-y-3">
+                            <!-- Features will be added here dynamically -->
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-wood-100">
+                            <button type="button" onclick="window.addFeatureRow('fa-shield-alt', 'blue')" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1.5"><i class="fas fa-shield-alt"></i> دژە ئاو</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-layer-group', 'wood')" class="px-3 py-2 bg-wood-50 text-wood-600 rounded-lg text-xs font-bold border border-wood-100 hover:bg-wood-100 transition flex items-center gap-1.5"><i class="fas fa-layer-group"></i> ئەستووری</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-fire-flame-curved', 'orange')" class="px-3 py-2 bg-orange-50 text-orange-600 rounded-lg text-xs font-bold border border-orange-100 hover:bg-orange-100 transition flex items-center gap-1.5"><i class="fas fa-fire-flame-curved"></i> دژە ئاگر</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-leaf', 'green')" class="px-3 py-2 bg-green-50 text-green-600 rounded-lg text-xs font-bold border border-green-100 hover:bg-green-100 transition flex items-center gap-1.5"><i class="fas fa-leaf"></i> ژینگە دۆست</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-ruler-combined', 'purple')" class="px-3 py-2 bg-purple-50 text-purple-600 rounded-lg text-xs font-bold border border-purple-100 hover:bg-purple-100 transition flex items-center gap-1.5"><i class="fas fa-ruler-combined"></i> قەبارە</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-palette', 'pink')" class="px-3 py-2 bg-pink-50 text-pink-600 rounded-lg text-xs font-bold border border-pink-100 hover:bg-pink-100 transition flex items-center gap-1.5"><i class="fas fa-palette"></i> ڕەنگ</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-boxes-stacked', 'indigo')" class="px-3 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-bold border border-indigo-100 hover:bg-indigo-100 transition flex items-center gap-1.5"><i class="fas fa-boxes-stacked"></i> مادە</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-certificate', 'yellow')" class="px-3 py-2 bg-yellow-50 text-yellow-700 rounded-lg text-xs font-bold border border-yellow-100 hover:bg-yellow-100 transition flex items-center gap-1.5"><i class="fas fa-certificate"></i> گەرەنتی</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-truck-fast', 'teal')" class="px-3 py-2 bg-teal-50 text-teal-600 rounded-lg text-xs font-bold border border-teal-100 hover:bg-teal-100 transition flex items-center gap-1.5"><i class="fas fa-truck-fast"></i> گەیاندن</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-star', 'gold')" class="px-3 py-2 bg-amber-50 text-amber-600 rounded-lg text-xs font-bold border border-amber-100 hover:bg-amber-100 transition flex items-center gap-1.5"><i class="fas fa-star"></i> کوالیتی</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-temperature-arrow-down', 'cyan')" class="px-3 py-2 bg-cyan-50 text-cyan-600 rounded-lg text-xs font-bold border border-cyan-100 hover:bg-cyan-100 transition flex items-center gap-1.5"><i class="fas fa-temperature-arrow-down"></i> گەرمی</button>
+                            <button type="button" onclick="window.addFeatureRow('fa-volume-xmark', 'slate')" class="px-3 py-2 bg-slate-50 text-slate-600 rounded-lg text-xs font-bold border border-slate-100 hover:bg-slate-100 transition flex items-center gap-1.5"><i class="fas fa-volume-xmark"></i> بێ دەنگ</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                        <h4 class="font-black text-gray-800 flex items-center gap-2 mb-4"><i class="fas fa-images text-wood-500"></i> وێنەی بەرهەم (ئەپڵۆد یان بەستەر)</h4>
+                        <div class="space-y-3">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">وێنەی سەرەکی بەرهەم (پێویستە)</label>
+                            <input type="file" id="apMainImgFile" accept="image/*" class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm outline-none focus:border-wood-500 font-medium cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-wood-50 file:text-wood-700 hover:file:bg-wood-100 transition-all bg-white">
+                            <div class="flex items-center gap-4 my-2">
+                                <div class="flex-1 h-px bg-gray-200"></div>
+                                <span class="text-xs font-bold text-gray-400">یان بەستەر (لینک) دابنێ</span>
+                                <div class="flex-1 h-px bg-gray-200"></div>
+                            </div>
+                            <input type="url" id="apMainImg" placeholder="https://..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm outline-none focus:border-wood-500 focus:ring-2 focus:ring-wood-500/20 transition-all font-mono" dir="ltr">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">دیمەنی هۆڵ (Living Room)</label>
+                                <input type="url" id="apLivImg" placeholder="https://..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm outline-none focus:border-wood-500 font-mono" dir="ltr">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">دیمەنی نوستن (Bedroom)</label>
+                                <input type="url" id="apBedImg" placeholder="https://..." class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm outline-none focus:border-wood-500 font-mono" dir="ltr">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="saveProductBtn" class="w-full py-5 bg-gradient-to-r from-wood-800 to-wood-600 hover:from-wood-900 hover:to-wood-700 text-white font-black text-xl rounded-2xl flex justify-center items-center gap-3 shadow-xl transition-all transform hover:-translate-y-1 mt-4">
+                        <i class="fas fa-cloud-upload-alt text-2xl"></i> پاشەکەوتکردن لە فایەربەیس
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Right Side: Live Preview -->
+            <div class="w-full md:w-1/3 bg-gray-100 relative hidden md:flex flex-col border-r border-gray-200">
+                <div class="p-6 bg-gray-200 border-b border-gray-300">
+                    <h4 class="font-black text-gray-700 text-center flex items-center justify-center gap-2"><i class="fas fa-eye text-wood-500"></i> پێشبینینی وێنە</h4>
+                </div>
+                <div class="flex-grow flex items-center justify-center p-6 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-5" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png'); pointer-events: none;"></div>
+                    <div id="previewImageWrapper" class="w-full aspect-[3/4] bg-white rounded-3xl shadow-md border-4 border-white overflow-hidden flex items-center justify-center relative">
+                        <i id="previewPlaceholderIcon" class="fas fa-image text-6xl text-gray-200 absolute"></i>
+                        <img id="liveImagePreview" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-500 relative z-10">
+                    </div>
+                </div>
+                <div class="p-6 text-center">
+                    <p class="text-xs text-gray-500 font-bold">کاتێک لینکی وێنەی سەرەکی دادەنێیت، لێرە دەردەکەوێت بۆ دڵنیابوون.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Confirm Modal (Replaces JS confirm()) -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-wood-900/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 print-hide">
+        <div class="bg-white rounded-[2rem] shadow-2xl p-10 max-w-sm w-full text-center transform scale-95 transition-transform duration-300" id="confirmModalContent">
+            <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                <div class="absolute inset-0 border-4 border-red-100 rounded-full animate-ping opacity-50"></div>
+                <i class="fas fa-exclamation-triangle text-5xl text-red-500 relative z-10"></i>
+            </div>
+            <h3 class="text-3xl font-black text-gray-900 mb-3">ئایا دڵنیایت؟</h3>
+            <p id="confirmModalText" class="text-gray-500 font-medium mb-10 text-lg">ئەم کردارە پاشگەزبوونەوەی تێدا نییە.</p>
+            <div class="flex gap-4">
+                <button id="confirmBtnNo" class="flex-1 py-4 rounded-xl font-black bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors text-lg">نەخێر</button>
+                <button id="confirmBtnYes" class="flex-1 py-4 rounded-xl font-black bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/30 transition-colors text-lg">بەڵێ، بیسڕەوە</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== PRINTABLE INVOICE TEMPLATE ==================== -->
+    <div id="print-invoice-area" class="hidden absolute top-0 left-0 w-full bg-white print-exact font-kurdish" style="padding: 10mm; direction: rtl; box-sizing: border-box;">
+        <div style="border: 2px solid #8b6456; padding: 2.5rem; border-radius: 16px; background-color: #fff; box-shadow: none; display: flex; flex-direction: column; flex-grow: 1; height: 100%;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #f2e8e5; padding-bottom: 1.5rem; margin-bottom: 2.5rem;">
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <div>
+                        <img src="/assets/logo-BO_EXJtV.png" style="height: 60px; object-fit: contain;">
+                        <p style="color: #8b6456; font-weight: bold; margin: 0; font-size: 16px; letter-spacing: 1px;">Premium Flooring Solutions</p>
+                    </div>
+                </div>
+                <div style="text-align: left; background: #fdf8f6; padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid #eaddd7;">
+                    <h2 style="font-size: 28px; font-weight: 900; color: #8b6456; margin: 0;">وەسڵی پارەدان</h2>
+                    <p style="color: #4c372f; font-size: 16px; margin-top: 5px; font-weight: bold; font-family: 'Inter', sans-serif;" id="printInvNo">INV-1001</p>
+                </div>
+            </div>
+            <!-- Customer Info -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2.5rem;">
+                <div style="background-color: #fdf8f6; padding: 1.5rem; border-radius: 12px; border-right: 6px solid #8b6456; width: 48%; border-top: 1px solid #eaddd7; border-bottom: 1px solid #eaddd7; border-left: 1px solid #eaddd7;">
+                    <h3 style="color: #6b4d42; font-size: 14px; margin-top: 0; margin-bottom: 8px; font-weight: bold;">وەسڵ کراوە بۆ بەڕێز:</h3>
+                    <p style="font-size: 22px; font-weight: 900; color: #2d211c; margin: 0;" id="printInvName" data-i18n="inv_name_val">ناوی کڕیار</p>
+                    <p style="color: #666; font-size: 16px; margin-top: 8px; font-family: 'Inter', sans-serif; font-weight: bold;"><span style="color:#8b6456;" data-i18n="inv_phone_lbl">مۆبایل:</span> <span id="printInvPhone">0750</span></p>
+                </div>
+                <div style="width: 45%; text-align: left; padding: 1rem; display: flex; flex-direction: column; justify-content: center;">
+                    <p style="margin: 0 0 10px 0; font-size: 16px; color: #6b4d42; font-weight: bold;">ڕێکەوتی دەرکردن:</p>
+                    <p style="margin: 0; font-size: 20px; font-weight: 900; color: #2d211c; font-family: 'Inter', sans-serif;" id="printInvDate" data-i18n="inv_date_val">2026/01/01</p>
+                </div>
+            </div>
+            <!-- Table -->
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 3rem; border: 2px solid #6b4d42; border-radius: 8px; overflow: hidden;">
+                <thead>
+                    <tr style="background-color: #6b4d42; color: white; -webkit-print-color-adjust: exact;">
+                        <th style="padding: 16px; text-align: right; font-size: 16px;">وەسفی کاڵا (جۆری پارکێت)</th>
+                        <th style="padding: 16px; text-align: center; width: 15%; font-size: 16px;">ڕووبەر (m²)</th>
+                        <th style="padding: 16px; text-align: center; width: 20%; font-size: 16px;">نرخی مەتر ($)</th>
+                        <th style="padding: 16px; text-align: center; width: 20%; font-size: 16px; background-color: #4c372f;">کۆی نرخ ($)</th>
+                    </tr>
+                </thead>
+                <tbody id="printInvTbody" style="font-family: 'Inter', sans-serif; font-weight: 600;"></tbody>
+            </table>
+            <!-- Totals & Signatures -->
+            <!-- Totals & Signatures -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; margin-top: auto;">
+                <div style="width: 45%; display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <p style="font-weight: bold; font-size: 16px; color: #6b4d42; margin-bottom: 10px;">ناوی فرۆشیار:</p>
+                        <input type="text" id="sellerNameInput" style="border:none; border-bottom: 2px dashed #a37c6c; width: 100%; font-size: 18px; font-weight: bold; color: #2d211c; outline: none; background: transparent; padding-bottom: 5px; font-family: 'Inter', sans-serif;" placeholder="ناوی خۆت بنووسە لێرە">
+                    </div>
+                    <div>
+                        <p style="font-weight: bold; font-size: 16px; color: #6b4d42; margin-bottom: 10px;">واژووی فرۆشیار:</p>
+                        <div style="width: 100%; border-bottom: 2px dashed #a37c6c; margin-top: 40px;"></div>
+                    </div>
+                </div>
+                <div style="background: linear-gradient(135deg, #fdf8f6, #f2e8e5); padding: 1.5rem 2.5rem; border-radius: 16px; border: 2px solid #8b6456; text-align: center; -webkit-print-color-adjust: exact;">
+                    <span style="font-size: 18px; font-weight: 900; color: #6b4d42;">کۆی گشتی پێویست:</span>
+                    <div style="font-size: 40px; font-weight: 900; color: #2d211c; margin-top: 5px; font-family: 'Inter', sans-serif;" id="printInvTotal">$0.00</div>
+                </div>
+            </div>
+            <!-- Footer Note -->
+            <div style="border-top: 2px solid #f2e8e5; padding-top: 1.5rem; text-align: center; font-size: 14px; color: #666; font-weight: bold;">
+                <p style="margin: 0 0 5px 0; color: #8b6456; font-size: 16px;">سوپاس بۆ متمانەتان بە کۆمپانیای زۆن پارکێت.</p>
+                <p style="margin: 0; font-family: 'Inter', sans-serif;">📍 ناونیشان: هەولێر، شەقامی 100 مەتری &nbsp;&nbsp;|&nbsp;&nbsp; 📞 پەیوەندی: 0750 000 0000</p>
+            </div>
+        </div>
+        </div>
+
+        <!-- Admin Mobile Bottom Nav -->
+        <div id="admin-bottom-nav" class="hidden fixed bottom-0 left-0 w-full bg-[#1a1310]/95 backdrop-blur-xl border-t border-wood-800 flex justify-between items-center px-2 pt-3 pb-safe md:hidden z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] pb-4 print-hide">
+            <button onclick="switchAdminTab('dashboard')" class="flex-1 flex flex-col items-center gap-1 text-gray-400 hover:text-gold-400 transition-colors">
+                <i class="fas fa-chart-pie text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">داشبۆرد</span>
+            </button>
+            <button onclick="switchAdminTab('products')" class="flex-1 flex flex-col items-center gap-1 text-gray-400 hover:text-gold-400 transition-colors">
+                <i class="fas fa-boxes text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">بەرهەم</span>
+            </button>
+            <button onclick="switchAdminTab('categories')" class="flex-1 flex flex-col items-center gap-1 text-gray-400 hover:text-gold-400 transition-colors">
+                <i class="fas fa-tags text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">پۆلێن</span>
+            </button>
+            <button onclick="switchAdminTab('invoice')" class="flex-1 flex flex-col items-center gap-1 text-gray-400 hover:text-gold-400 transition-colors relative -top-5">
+                <div class="w-14 h-14 bg-gradient-to-tr from-gold-400 to-gold-600 text-wood-950 rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(212,175,55,0.4)] transform hover:scale-105 border-4 border-[#1a1310] transition-all mx-auto">
+                    <i class="fas fa-file-invoice-dollar text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-1 text-gold-400">وەسڵ</span>
+            </button>
+            <button onclick="switchAdminTab('orders')" class="flex-1 flex flex-col items-center gap-1 text-gray-400 hover:text-gold-400 transition-colors">
+                <i class="fas fa-shopping-bag text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">داواکاری</span>
+            </button>
+            <button onclick="switchAdminTab('settings')" class="flex-1 flex flex-col items-center gap-1 text-gray-400 hover:text-gold-400 transition-colors">
+                <i class="fas fa-cog text-xl mb-1"></i>
+                <span class="text-[10px] font-bold">ڕێکخستن</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Product Preview Modal (Public) -->
+    <div id="productModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-wood-900/80 backdrop-blur-md print-hide opacity-0 transition-opacity duration-400">
+        <div class="absolute inset-0 cursor-pointer" onclick="closeModal()"></div>
+        <div class="relative bg-white w-full max-w-6xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] transform scale-95 transition-transform duration-400" id="publicModalContent">
+            
+            <button onclick="closeModal()" class="absolute top-5 right-5 z-20 w-12 h-12 bg-white/50 hover:bg-white backdrop-blur-md rounded-full flex items-center justify-center shadow-lg transition-all transform hover:rotate-90 text-gray-800 border border-gray-200">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            
+            <div class="w-full md:w-3/5 bg-gray-100 relative flex flex-col">
+                <div class="relative h-64 md:h-[550px] w-full overflow-hidden bg-wood-50">
+                    <img id="modalPreviewImg" src="" class="w-full h-full object-cover transition-all duration-500 ease-in-out">
+                    <div class="absolute inset-0 shadow-[inset_0_0_50px_rgba(0,0,0,0.1)] pointer-events-none"></div>
+                </div>
+                <div class="bg-white p-4 border-t border-gray-200 flex justify-center gap-3">
+                    <button id="tabMain" class="preview-tab active flex-1 py-3 px-4 rounded-xl font-black border-2 border-transparent bg-gray-100 hover:bg-gray-200 text-gray-600 transition-all" onclick="changePreviewTab('main')"><i class="fas fa-box-open mr-2"></i> پارچە</button>
+                    <button id="tabLiving" class="preview-tab flex-1 py-3 px-4 rounded-xl font-black border-2 border-transparent bg-gray-100 hover:bg-gray-200 text-gray-600 transition-all" onclick="changePreviewTab('living')"><i class="fas fa-couch mr-2"></i> هۆڵ</button>
+                    <button id="tabBedroom" class="preview-tab flex-1 py-3 px-4 rounded-xl font-black border-2 border-transparent bg-gray-100 hover:bg-gray-200 text-gray-600 transition-all" onclick="changePreviewTab('bedroom')"><i class="fas fa-bed mr-2"></i> نوستن</button>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-2/5 p-8 md:p-10 flex flex-col overflow-y-auto custom-scrollbar bg-white">
+                <div class="mb-4 flex flex-wrap gap-2 items-center">
+                    <span id="modalCode" class="px-4 py-1.5 bg-wood-900 text-gold-400 rounded-lg text-sm font-black tracking-wider shadow-sm font-mono"></span>
+                    <span id="modalCountryBadge" class="px-4 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold border border-gray-200 shadow-sm flex items-center gap-2"></span>
+                    <span id="modalWaterBadge" class="hidden px-4 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-bold border border-blue-100 shadow-sm flex items-center gap-2"><i class="fas fa-shield-alt"></i> دژە ئاو</span>
+                </div>
+                
+                <h2 id="modalTitle" class="text-3xl md:text-4xl font-black mb-4 text-gray-900 leading-tight"></h2>
+                <p id="modalDesc" class="text-gray-500 mb-8 font-medium leading-relaxed text-lg"></p>
+                
+                <!-- Professional Features Display -->
+                <div id="modalFeatures" class="mb-6 hidden">
+                    <h4 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-gem text-wood-400"></i> تایبەتمەندییەکان</h4>
+                    <div id="modalFeaturesGrid" class="grid grid-cols-2 gap-3">
+                        <!-- Features rendered by JS -->
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100 shadow-inner">
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-4 mb-4">
+                        <span class="text-gray-500 font-bold text-lg">ئەستووری (Thickness)</span>
+                        <span id="modalThickness" class="font-black text-gray-800 text-xl font-mono" dir="ltr"></span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                        <span class="text-gray-500 font-bold text-lg">نرخی یەک مەتر</span>
+                        <div class="flex flex-col items-end">
+                            <span id="modalPrice" class="font-black text-4xl text-wood-600"></span>
+                            <span id="modalPriceIQD" class="font-black text-lg text-gray-400 mt-1" dir="ltr"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="modalOrderBtn" class="mt-auto w-full py-5 rounded-2xl font-black text-wood-900 bg-gradient-to-r from-gold-400 to-gold-500 shadow-xl shadow-gold-500/30 hover:shadow-2xl transition-all transform hover:-translate-y-1 flex justify-center items-center gap-3 text-xl pulse-btn border border-gold-300">
+                    <i class="fas fa-cart-plus text-2xl"></i> هەڵبژاردن بۆ داواکردن
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Element -->
+    <div id="toast" class="print-hide">
+        <i class="fas fa-check-circle text-4xl"></i>
+        <div class="flex flex-col">
+            <span id="toastTitle" class="font-black text-sm text-gray-400 uppercase tracking-wider mb-0.5">ئاگاداری</span>
+            <span id="toastMsg" class="font-bold text-lg text-white"></span>
+        </div>
+    </div>
+
+    <!-- Configuration & Credentials -->
+    <script>
+        const TELEGRAM_BOT_TOKEN = '7905473054:AAFVXdYAeI2kzjP-j2WrqQH5_njuE-i4Ghc'; 
+        const TELEGRAM_CHAT_ID = '-5280233277';
+    </script>
+
+    <!-- Firebase System Module -->
+
+    <!-- Leaflet Map Setup -->
+    <script>
+        let mapInitialized = false;
+        window.initMapIfNeeded = function() {
+            if(mapInitialized) return;
+            const defaultLat = 36.1901; 
+            const defaultLng = 43.9930;
+            
+            const map = L.map('map', { scrollWheelZoom: false }).setView([defaultLat, defaultLng], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+            
+            const customIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: "<div style='background-color:#8b6456; width:28px; height:28px; border-radius:50%; border:4px solid white; box-shadow:0 5px 15px rgba(139,100,86,0.6);'></div>",
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+
+            const marker = L.marker([defaultLat, defaultLng], {draggable: true, icon: customIcon}).addTo(map);
+            document.getElementById('latInput').value = defaultLat;
+            document.getElementById('lngInput').value = defaultLng;
+            
+            marker.on('dragend', function() {
+                const pos = marker.getLatLng();
+                document.getElementById('latInput').value = pos.lat; document.getElementById('lngInput').value = pos.lng;
+            });
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                document.getElementById('latInput').value = e.latlng.lat; document.getElementById('lngInput').value = e.latlng.lng;
+            });
+
+            setTimeout(() => map.invalidateSize(), 800);
+            mapInitialized = true;
+        }
+
+        let wMapInitialized = false;
+        window.initWholesaleMapIfNeeded = function() {
+            if(wMapInitialized) return;
+            const defaultLat = 36.1901; 
+            const defaultLng = 43.9930;
+            
+            const map = L.map('wMap', { scrollWheelZoom: false }).setView([defaultLat, defaultLng], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+            
+            const customIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: "<div style='background-color:#000000; width:28px; height:28px; border-radius:50%; border:4px solid #eab308; box-shadow:0 5px 15px rgba(234,179,8,0.6);'></div>",
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+
+            const marker = L.marker([defaultLat, defaultLng], {draggable: true, icon: customIcon}).addTo(map);
+            document.getElementById('wLatInput').value = defaultLat;
+            document.getElementById('wLngInput').value = defaultLng;
+            
+            marker.on('dragend', function() {
+                const pos = marker.getLatLng();
+                document.getElementById('wLatInput').value = pos.lat; document.getElementById('wLngInput').value = pos.lng;
+            });
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                document.getElementById('wLatInput').value = e.latlng.lat; document.getElementById('wLngInput').value = e.latlng.lng;
+            });
+
+            setTimeout(() => map.invalidateSize(), 800);
+            wMapInitialized = true;
+        }
+    </script>
+
+    <!-- i18n Script -->
+    <script>
+        const translations = {
+            ku: {
+                nav_catalog: "کەتەلۆگ",
+                nav_order: "داواکردن",
+                hero_badge: "بەرزترین کوالیتی پارکێت لە کوردستان",
+                hero_title_1: "جوانی و سروشت بۆ",
+                hero_title_2: "ناوەوەی ماڵەکەت",
+                hero_desc: "بەرزترین ئاستی پارکێت، دژە ئاو، ڕەنگی نەگۆڕ و ستایلی سەردەمیانە. ئێستا جۆرەکان ببینە و ڕاستەوخۆ داوای بکە بۆ گەیاندن.",
+                hero_btn: "بینینی کەتەلۆگ",
+                cat_title: "کەتەلۆگی بەرهەمەکان",
+                cat_desc: "جۆرە جیاوازەکانی پارکێت بە قیاس و ڕەنگی جیاواز",
+                cat_all: "هەمووی",
+                cat_water: "دژە ئاو",
+                cat_loading: "خەریکی هێنانی زانیارییەکان...",
+                cat_empty: "هیچ بەرهەمێک لە کەتەلۆگدا نییە.",
+                order_title: "فۆڕمی داواکاری پڕۆفیشناڵ",
+                order_desc: "زانیارییەکانت بە وردی پڕبکەرەوە، تیمی ئێمە لە کەمترین کاتدا پەیوەندیت پێوە دەکەن.",
+                order_product: "جۆری پارکێت",
+                order_area: "ڕووبەر (مەتر دووجا)",
+                order_name: "ناوی تەواو",
+                order_phone: "مۆبایل",
+                order_address: "ناونیشانی تەواو",
+                order_map: "دیاریکردنی شوێن لەسەر نەخشە",
+                order_map_desc: "مارکەرەکە ڕابکێشە بۆ سەر ماڵەکەت یان شوێنی کارەکەت.",
+                order_submit: "ناردنی داواکاری بۆ کۆمپانیا",
+                footer_desc: "باشترین جۆرەکانی پارکێت بە گەرەنتی و کوالیتی بەرز بۆ ماڵ و شوێنی کارەکەت.",
+                footer_copy: "&copy; 2026 گشت مافەکانی پارێزراوە بۆ زۆن پارکێت.",
+                // Invoice
+                inv_title: "دروستکردنی وەسڵی پڕۆفیشناڵ",
+                inv_desc: "زانیارییەکانی کڕیار و بەرهەمەکان پڕبکەرەوە بۆ دەرکردنی وەسڵ.",
+                inv_name: "ناوی کڕیار",
+                inv_phone: "مۆبایل",
+                inv_date: "بەروار",
+                inv_no: "ژمارەی وەسڵ",
+                inv_add_item: "زیادکردنی پارکێت بۆ ناو وەسڵەکە",
+                inv_select: "هەڵبژاردنی پارکێت لە کەتەلۆگ",
+                inv_area: "ڕووبەر (مەتر چوارگۆشە)",
+                inv_price: "نرخی مەتر ($)",
+                inv_tbl_desc: "وەسفی کاڵا",
+                inv_tbl_area: "ڕووبەر (m²)",
+                inv_tbl_price: "نرخ ($)",
+                inv_tbl_total: "کۆ ($)",
+                inv_tbl_del: "سڕینەوە",
+                inv_grand_total: "کۆی گشتی پێویست (Total)",
+                inv_print_btn: "دەرکردن و چاپکردنی وەسڵ",
+                inv_name_val: "ناوی کڕیار",
+                inv_phone_lbl: "مۆبایل:",
+                inv_date_val: "بەروار",
+                inv_ptbl_desc: "وەسفی کاڵا",
+                inv_ptbl_qty: "بڕ (m²)",
+                inv_ptbl_price: "نرخ ($)",
+                inv_ptbl_total: "کۆ ($)",
+                inv_pgrand_total: "کۆی گشتی"
+            },
+            en: {
+                nav_catalog: "Catalog",
+                nav_order: "Order Now",
+                hero_badge: "Highest Quality Parquet in Kurdistan",
+                hero_title_1: "Beauty & Nature for",
+                hero_title_2: "Your Home Interior",
+                hero_desc: "Premium grade parquet, waterproof, colorfast, and modern styles. View our selection now and order directly for delivery.",
+                hero_btn: "View Catalog",
+                cat_title: "Product Catalog",
+                cat_desc: "Different types of parquet in various sizes and colors",
+                cat_all: "All",
+                cat_water: "Waterproof",
+                cat_loading: "Loading information...",
+                cat_empty: "No products in the catalog.",
+                order_title: "Professional Order Form",
+                order_desc: "Fill in your details accurately, and our team will contact you shortly.",
+                order_product: "Parquet Type",
+                order_area: "Area (sq meters)",
+                order_name: "Full Name",
+                order_phone: "Phone Number",
+                order_address: "Full Address",
+                order_map: "Location on Map",
+                order_map_desc: "Drag the marker to your home or workplace.",
+                order_submit: "Send Order to Company",
+                footer_desc: "The best types of parquet with high quality and guarantee for your home and workplace.",
+                footer_copy: "&copy; 2026 All rights reserved for Zone Parquet.",
+                // Invoice
+                inv_title: "Create Professional Invoice",
+                inv_desc: "Fill in the customer details and products to generate the invoice.",
+                inv_name: "Customer Name",
+                inv_phone: "Phone Number",
+                inv_date: "Date",
+                inv_no: "Invoice Number",
+                inv_add_item: "Add Parquet to Invoice",
+                inv_select: "Select Parquet from Catalog",
+                inv_area: "Area (sqm)",
+                inv_price: "Price per sqm ($)",
+                inv_tbl_desc: "Description",
+                inv_tbl_area: "Area (m²)",
+                inv_tbl_price: "Price ($)",
+                inv_tbl_total: "Total ($)",
+                inv_tbl_del: "Delete",
+                inv_grand_total: "Grand Total",
+                inv_print_btn: "Generate and Print Invoice",
+                inv_name_val: "Customer Name",
+                inv_phone_lbl: "Phone:",
+                inv_date_val: "Date",
+                inv_ptbl_desc: "Description",
+                inv_ptbl_qty: "Qty (m²)",
+                inv_ptbl_price: "Price ($)",
+                inv_ptbl_total: "Total ($)",
+                inv_pgrand_total: "Grand Total"
+            },
+            ar: {
+                nav_catalog: "الكتالوج",
+                nav_order: "اطلب الآن",
+                hero_badge: "أعلى جودة باركيه في كردستان",
+                hero_title_1: "الجمال والطبيعة لـ",
+                hero_title_2: "ديكور منزلك",
+                hero_desc: "باركيه عالي الجودة، مقاوم للماء، ألوان ثابتة وتصاميم عصرية. تصفح الأنواع الآن واطلب مباشرة للتوصيل.",
+                hero_btn: "عرض الكتالوج",
+                cat_title: "كتالوج المنتجات",
+                cat_desc: "أنواع مختلفة من الباركيه بمقاسات وألوان متنوعة",
+                cat_all: "الكل",
+                cat_water: "مقاوم للماء",
+                cat_loading: "جاري تحميل المعلومات...",
+                cat_empty: "لا توجد منتجات في الكتالوج.",
+                order_title: "نموذج طلب احترافي",
+                order_desc: "يرجى ملء بياناتك بدقة، وسيقوم فريقنا بالاتصال بك في أقرب وقت.",
+                order_product: "نوع الباركيه",
+                order_area: "المساحة (متر مربع)",
+                order_name: "الاسم الكامل",
+                order_phone: "رقم الهاتف",
+                order_address: "العنوان الكامل",
+                order_map: "تحديد الموقع على الخريطة",
+                order_map_desc: "اسحب العلامة إلى منزلك أو مكان عملك.",
+                order_submit: "إرسال الطلب للشركة",
+                footer_desc: "أفضل أنواع الباركيه بجودة عالية وضمان لمنزلك ومكان عملك.",
+                footer_copy: "&copy; 2026 جميع الحقوق محفوظة لزون باركيه.",
+                // Invoice
+                inv_title: "إنشاء فاتورة احترافية",
+                inv_desc: "قم بتعبئة بيانات العميل والمنتجات لإصدار الفاتورة.",
+                inv_name: "اسم العميل",
+                inv_phone: "رقم الهاتف",
+                inv_date: "التاريخ",
+                inv_no: "رقم الفاتورة",
+                inv_add_item: "إضافة باركيه إلى الفاتورة",
+                inv_select: "اختر الباركيه من الكتالوج",
+                inv_area: "المساحة (متر مربع)",
+                inv_price: "سعر المتر ($)",
+                inv_tbl_desc: "وصف المنتج",
+                inv_tbl_area: "المساحة (m²)",
+                inv_tbl_price: "السعر ($)",
+                inv_tbl_total: "المجموع ($)",
+                inv_tbl_del: "حذف",
+                inv_grand_total: "المجموع الكلي",
+                inv_print_btn: "إصدار وطباعة الفاتورة",
+                inv_name_val: "اسم العميل",
+                inv_phone_lbl: "الهاتف:",
+                inv_date_val: "التاريخ",
+                inv_ptbl_desc: "وصف المنتج",
+                inv_ptbl_qty: "الكمية (m²)",
+                inv_ptbl_price: "السعر ($)",
+                inv_ptbl_total: "المجموع ($)",
+                inv_pgrand_total: "المجموع الكلي"
+            }
+        };
+
+        window.changeLanguage = function(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = (lang === 'en') ? 'ltr' : 'rtl';
+            
+            const nav = document.getElementById('main-nav');
+            if(nav) {
+                if(lang === 'en') {
+                    nav.classList.remove('space-x-reverse');
+                } else {
+                    nav.classList.add('space-x-reverse');
+                }
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            
+            // Re-render select placeholder if possible
+            const sel = document.getElementById('productSelect');
+            if(sel && sel.options[0].disabled) {
+                sel.options[0].text = (lang === 'en') ? "Please select..." : (lang === 'ar') ? "يرجى التحديد..." : "تکایە هەڵبژێرە...";
+            }
+
+            localStorage.setItem('prefLang', lang);
+        };
+
+        // Initialize language
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('prefLang') || 'ku';
+            const switcher = document.getElementById('langSwitcher');
+            if(switcher) switcher.value = savedLang;
+            window.changeLanguage(savedLang);
+        });
+    </script>
+    <!-- Professional Auto-Update Checker -->
+    <script>
+        (function() {
+            let currentEtag = null;
+            let currentLastModified = null;
+            
+            async function checkForUpdate() {
+                try {
+                    const response = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+                    const etag = response.headers.get('Etag');
+                    const lastModified = response.headers.get('Last-Modified');
+                    
+                    if (!currentEtag && !currentLastModified) {
+                        currentEtag = etag;
+                        currentLastModified = lastModified;
+                        return;
+                    }
+
+                    if ((etag && currentEtag && etag !== currentEtag) || 
+                        (lastModified && currentLastModified && lastModified !== currentLastModified)) {
+                        showUpdateToast();
+                    }
+                } catch (e) {
+                    console.log('Update check failed', e);
+                }
+            }
+
+            function showUpdateToast() {
+                if(document.getElementById('update-toast')) return;
+                
+                const toast = document.createElement('div');
+                toast.id = 'update-toast';
+                toast.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-[99999] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-gold-200 p-4 flex items-center gap-4 fade-in-up w-[90%] max-w-md';
+                toast.innerHTML = `
+                    <div class="w-12 h-12 bg-gold-50 text-gold-500 rounded-full flex items-center justify-center text-xl shadow-inner border border-gold-100 flex-shrink-0">
+                        <i class="fas fa-sync-alt animate-spin"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="font-black text-wood-900 text-sm md:text-base">وەشانێکی نوێ بەردەستە 🚀</h4>
+                        <p class="text-xs md:text-sm text-wood-500 font-medium mt-0.5">زانیارییەکان نوێکرانەوە، تکایە ڕیفرێش بکە.</p>
+                    </div>
+                    <button onclick="window.location.reload(true)" class="bg-gradient-to-r from-wood-800 to-wood-950 hover:from-wood-950 hover:to-black text-gold-400 font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg text-sm flex-shrink-0 pulse-btn border border-wood-700">
+                        ڕیفرێش
+                    </button>
+                    <button onclick="this.parentElement.remove()" class="absolute -top-2 -right-2 w-7 h-7 bg-white text-gray-400 hover:text-red-500 rounded-full flex items-center justify-center shadow-sm border border-gray-200 transition-colors">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                document.body.appendChild(toast);
+            }
+
+            setTimeout(checkForUpdate, 3000); // Initial check
+            setInterval(checkForUpdate, 5 * 60 * 1000); // Check every 5 minutes
+            
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') checkForUpdate();
+            });
+        })();
+    </script>
+</body>
+</html>
+

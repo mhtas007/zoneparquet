@@ -1,0 +1,512 @@
+Created At: 2026-06-21T01:44:37Z
+Completed At: 2026-06-21T01:44:38Z
+File Path: `file:///c:/Users/Ram%20Computer/OneDrive/Desktop/mas%20menu%20plaform%20menu/%D8%B2%DB%86%D9%86%20%D9%BE%D8%A7%D8%B1%DA%A9%DB%8E%D8%AA/index.html`
+Total Lines: 3112
+Total Bytes: 231659
+Showing lines 1 to 800
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: <!DOCTYPE html>
+2: <html lang="ku" dir="rtl">
+3: <head>
+4:     <meta charset="UTF-8">
+5:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+6:     <title>Zone Parquet | کەتەلۆگ و سیستەم</title>
+7:     
+8:     <!-- Tailwind CSS -->
+9:     <script src="https://cdn.tailwindcss.com"></script>
+10:     <script>
+11:         tailwind.config = {
+12:             theme: {
+13:                 extend: {
+14:                     colors: {
+15:                         wood: {
+16:                             50: '#fdf8f6', 100: '#f2e8e5', 200: '#eaddd7', 300: '#e0cec7',
+17:                             400: '#d2bab0', 500: '#a37c6c', 600: '#8b6456', 700: '#6b4d42',
+18:                             800: '#4c372f', 900: '#2d211c', 950: '#1a1310'
+19:                         },
+20:                         gold: {
+21:                             400: '#E6C96B', 500: '#D4AF37', 600: '#AA8C2C',
+22:                         }
+23:                     },
+24:                     fontFamily: {
+25:                         'kurdish': ['Rabar_013', 'NRT Reg', 'Arial', 'sans-serif'],
+26:                     },
+27:                     boxShadow: {
+28:                         'premium': '0 25px 50px -12px rgba(139, 100, 86, 0.25)',
+29:                         'glow': '0 0 15px rgba(212, 175, 55, 0.5)',
+30:                         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+31:                     }
+32:                 }
+33:             }
+34:         }
+35:     </script>
+36: 
+37:     <!-- Font Awesome -->
+38:     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+39:     <!-- Google Fonts -->
+40:     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+41:     <!-- Leaflet CSS & JS -->
+42:     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+43:     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+44: 
+45:     <style>
+46:         body { font-family: 'Inter', 'kurdish', sans-serif; background-color: #FAFAF9; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+47:         body.modal-open { overflow: hidden; }
+48: 
+49:         /* General Styles */
+50:         .product-card { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center bottom; }
+51:         .product-card:hover { transform: translateY(-12px); box-shadow: 0 30px 60px -15px rgba(163, 124, 108, 0.3); }
+52:         .product-img-wrapper img { transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+53:         .product-card:hover .product-img-wrapper img { transform: scale(1.1); }
+54:         .filter-btn-retail, .filter-btn-whole { transition: all 0.3s ease; }
+55:         .filter-btn-retail.active, .filter-btn-whole.active { background: linear-gradient(135deg, #8b6456, #4c372f); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(139, 100, 86, 0.4); }
+56:         #map { height: 350px; width: 100%; border-radius: 1rem; z-index: 1; border: 2px solid #eaddd7; }
+57:         .fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(40px); }
+58:         
+59:         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+60:         @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); } 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } }
+61:         
+62:         .pulse-btn:hover { animation: pulseGlow 1.5s infinite; }
+63: 
+64:         /* Modals & Scrollbars */
+65:         .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+66:         .custom-scrollbar::-webkit-scrollbar-track { background: #fdf8f6; border-radius: 10px;}
+67:         .custom-scrollbar::-webkit-scrollbar-thumb { background: #d2bab0; border-radius: 10px; border: 2px solid #fdf8f6; }
+68:         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a37c6c; }
+69:         
+70:         /* Toast */
+71:         #toast { visibility: hidden; background: linear-gradient(135deg, #2d211c, #1a1310); color: #fff; padding: 16px 28px; border-radius: 16px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px) scale(0.9); opacity: 0; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 14px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+72:         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+73: 
+74:         /* Glassmorphism */
+75:         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+76: 
+77:         /* Print Styles for Invoice */
+78:         @media print {
+79:             body * { visibility: hidden; }
+80:             #print-invoice-area, #print-invoice-area * { visibility: visible; }
+81:             #print-invoice-area { display: flex !important; flex-direction: column; position: absolute; left: 0; top: 0; width: 100%; height: 296mm; background: white; padding: 0 !important; margin: 0 !important; z-index: 99999; box-sizing: border-box; }
+82:             @page { size: A4; margin: 0; }
+83:             .print-exact { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+84:             .shadow-lg, .shadow-md, .shadow-sm, .shadow-premium { box-shadow: none !important; }
+85:         }
+86:     </style>
+87: </head>
+88: <body class="text-gray-800 antialiased relative">
+89: 
+90:     <!-- ==================== MAIN PUBLIC APP ==================== -->
+91:     <div id="public-app" class="block">
+92:         <header id="site-header" class="bg-white/85 backdrop-blur-xl shadow-sm sticky top-0 z-40 transition-all border-b border-gray-100">
+93:             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+94:                 <div class="flex justify-between items-center h-20">
+95:                     <div class="flex items-center">
+96:                         <a href="#" id="brand-logo" class="flex items-center gap-3 group cursor-pointer select-none" title="Zone Parquet">
+97:                             <div class="w-12 h-12 bg-gradient-to-br from-wood-600 to-wood-900 rounded-xl flex items-center justify-center text-gold-400 font-bold text-2xl shadow-lg transition-transform group-hover:scale-105 border border-wood-500/30">ZP</div>
+98:                             <div class="flex flex-col">
+99:                                 <span class="font-black text-2xl tracking-tight text-wood-900 leading-none">Zone <span class="text-wood-500">Parquet</span></span>
+100:                             </div>
+101:                         </a>
+102:                     </div>
+103:                     <div class="flex items-center gap-4">
+104:                         <div class="relative bg-gray-50 border border-gray-200 rounded-xl overflow-hidden flex items-center px-2 py-1 shadow-sm">
+105:                             <i class="fas fa-globe text-gray-400 text-sm ml-2 mr-2"></i>
+106:                             <select id="langSwitcher" onchange="changeLanguage(this.value)" class="bg-transparent text-gray-700 text-sm font-bold focus:outline-none appearance-none cursor-pointer py-1 pr-6 pl-2" dir="ltr">
+107:                                 <option value="ku" selected>کوردی</option>
+108:                                 <option value="en">English</option>
+109:                                 <option value="ar">العربية</option>
+110:                             </select>
+111:                             <i class="fas fa-chevron-down absolute right-2 text-[10px] text-gray-400 pointer-events-none"></i>
+112:                         </div>
+113:                         <nav id="main-nav" class="hidden md:flex space-x-8 space-x-reverse items-center">
+114:                             <a href="#catalog" class="text-gray-600 hover:text-wood-600 font-bold transition" data-i18n="nav_catalog">کەتەلۆگ</a>
+115:                             <a href="#order" class="px-6 py-2.5 rounded-full bg-wood-900 text-white font-bold hover:bg-wood-800 transition shadow-md hover:shadow-lg" data-i18n="nav_order">داواکردن</a>
+116:                         </nav>
+117:                     </div>
+118:                 </div>
+119:             </div>
+120:         </header>
+121: 
+122:         <main>
+123:             <!-- Hero -->
+124:             <section class="relative bg-wood-900 overflow-hidden text-white py-28 lg:py-40 flex flex-col items-center text-center">
+125:                 <div class="absolute inset-0 z-0">
+126:                     <img src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover opacity-20 mix-blend-luminosity">
+127:                     <div class="absolute inset-0 bg-gradient-to-t from-wood-950 via-wood-900/60 to-transparent"></div>
+128:                     <div class="absolute inset-0 bg-gradient-to-b from-wood-900/80 via-transparent to-transparent"></div>
+129:                 </div>
+130:                 <div class="relative z-10 max-w-5xl mx-auto px-4">
+131:                     <div class="inline-block px-4 py-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400 font-bold text-sm mb-6 fade-in-up backdrop-blur-md shadow-glass"><span data-i18n="hero_badge">بەرزترین کوالیتی پارکێت لە کوردستان</span></div>
+132:                     <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 fade-in-up" style="animation-delay: 0.1s; line-height: 1.2;">
+133:                         <span data-i18n="hero_title_1">جوانی و سروشت بۆ</span> <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-wood-300"><span data-i18n="hero_title_2">ناوەوەی ماڵەکەت</span></span>
+134:                     </h1>
+135:                     <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto fade-in-up font-medium" style="animation-delay: 0.2s;">
+136:                         <span data-i18n="hero_desc">بەرزترین ئاستی پارکێت، دژە ئاو، ڕەنگی نەگۆڕ و ستایلی سەردەمیانە. ئێستا جۆرەکان ببینە و ڕاستەوخۆ داوای بکە بۆ گەیاندن.</span>
+137:                     </p>
+138:                     <div class="mt-10 fade-in-up" style="animation-delay: 0.3s;">
+139:                         <a href="#catalog" class="px-8 py-4 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-wood-900 font-black text-lg hover:shadow-glow transition pulse-btn inline-flex items-center gap-2">
+140:                             <span data-i18n="hero_btn">بینینی کەتەلۆگ</span> <i class="fas fa-arrow-down"></i>
+141:                         </a>
+142:                     </div>
+143:                 </div>
+144:             </section>
+145: 
+146:             <!-- Catalog -->
+147:             <section id="catalog" class="py-24 bg-gray-50 relative">
+148:                 <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+149:                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+150:                     <div class="flex flex-col mb-16 gap-6">
+151:                         <div class="text-center md:text-right">
+152:                             <h2 class="text-4xl font-black text-gray-900 mb-3"><span data-i18n="cat_title">کەتەلۆگی بەرهەمەکان</span></h2>
+153:                             <p class="text-gray-500 font-medium"><span data-i18n="cat_desc">جۆرە جیاوازەکانی پارکێت بە قیاس و ڕەنگی جیاواز</span></p>
+154:                         </div>
+155:                         <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between z-20 relative">
+156:                             <div class="flex flex-wrap justify-center gap-2">
+157:                                 <button class="filter-btn-retail active px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50" data-filter="all">هەمووی</button>
+158:                                 <button class="filter-btn-retail px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 flex items-center gap-2" data-filter="waterproof"><i class="fas fa-shield-alt text-blue-500"></i> <span data-i18n="cat_water">دژە ئاو</span></button>
+159:                             </div>
+160:                             <div class="flex flex-wrap gap-3 items-center justify-center">
+161:                                 <div class="relative group">
+162:                                     <i class="fas fa-sort-amount-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+163:                                     <select id="sortPriceRetail" onchange="window.applyRetailFilters()" class="pr-12 pl-8 py-2.5 bg-gray-50 border-2 border-gray-100 hover:border-wood-300 rounded-xl text-sm font-bold outline-none focus:border-wood-500 transition-colors cursor-pointer appearance-none">
+164:                                         <option value="">ڕیزکردنی نرخ</option>
+165:                                         <option value="asc">کەمترین بۆ بەرزترین</option>
+166:                                         <option value="desc">بەرزترین بۆ کەمترین</option>
+167:                                     </select>
+168:                                     <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+169:                                 </div>
+170:                                 <div class="relative group">
+171:                                     <i class="fas fa-globe absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+172:                                     <select id="filterCountryRetail" onchange="window.applyRetailFilters()" class="pr-12 pl-8 py-2.5 bg-gray-50 border-2 border-gray-100 hover:border-wood-300 rounded-xl text-sm font-bold outline-none focus:border-wood-500 transition-colors cursor-pointer appearance-none">
+173:                                         <option value="">هەموو وڵاتێک</option>
+174:                                     </select>
+175:                                     <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+176:                                 </div>
+177:                                 <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border-2 border-gray-100 focus-within:border-wood-500 transition-colors hover:border-wood-300">
+178:                                     <input type="number" id="minPriceRetail" placeholder="کەمترین $" oninput="window.applyRetailFilters()" class="w-24 bg-white px-3 py-1.5 rounded-lg text-sm font-bold outline-none text-center shadow-sm" dir="ltr">
+179:                                     <span class="text-gray-400 font-black">-</span>
+180:                                     <input type="number" id="maxPriceRetail" placeholder="بەرزترین $" oninput="window.applyRetailFilters()" class="w-24 bg-white px-3 py-1.5 rounded-lg text-sm font-bold outline-none text-center shadow-sm" dir="ltr">
+181:                                 </div>
+182:                             </div>
+183:                         </div>
+184:                     </div>
+185:                     
+186:                     <!-- Loading State -->
+187:                     <div id="catalog-loading" class="text-center py-20">
+188:                         <div class="w-16 h-16 border-4 border-wood-200 border-t-wood-600 rounded-full animate-spin mx-auto mb-6"></div>
+189:                         <p class="text-gray-500 font-bold text-lg"><span data-i18n="cat_loading">خەریکی هێنانی زانیارییەکان...</span></p>
+190:                     </div>
+191: 
+192:                     <!-- Grid -->
+193:                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 hidden" id="product-grid"></div>
+194:                     
+195:                     <!-- Empty State -->
+196:                     <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+197:                         <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+198:                         <h3 class="text-2xl font-bold text-gray-600"><span data-i18n="cat_empty">هیچ بەرهەمێک لە کەتەلۆگدا نییە.</span></h3>
+199:                     </div>
+200:                 </div>
+201:             </section>
+202: 
+203:             <!-- Order Form -->
+204:             <section id="order" class="py-24 bg-white relative">
+205:                 <div class="max-w-5xl mx-auto px-4 relative z-10">
+206:                     <div class="bg-white rounded-[2.5rem] shadow-premium overflow-hidden border border-gray-100 relative">
+207:                         <!-- Decor -->
+208:                         <div class="absolute top-0 right-0 w-64 h-64 bg-wood-100 rounded-full blur-3xl -mr-32 -mt-32 z-0 opacity-50"></div>
+209:                         <div class="absolute bottom-0 left-0 w-64 h-64 bg-gold-50 rounded-full blur-3xl -ml-32 -mb-32 z-0 opacity-50"></div>
+210:                         
+211:                         <div class="bg-gradient-to-r from-wood-950 to-wood-800 text-white p-10 md:p-14 text-center relative z-10 overflow-hidden">
+212:                             <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');"></div>
+213:                             <h2 class="text-4xl font-black mb-4 relative z-10"><span data-i18n="order_title">فۆڕمی داواکاری پڕۆفیشناڵ</span></h2>
+214:                             <p class="text-wood-300 font-medium relative z-10 max-w-lg mx-auto"><span data-i18n="order_desc">زانیارییەکانت بە وردی پڕبکەرەوە، تیمی ئێمە لە کەمترین کاتدا پەیوەندیت پێوە دەکەن.</span></p>
+215:                         </div>
+216:                     <form id="orderForm" class="bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100 relative flex flex-col xl:flex-row">
+217:                         <!-- Left Side: Order Details & Total (Receipt style) -->
+218:                         <div class="w-full xl:w-2/5 bg-gray-50 p-8 md:p-12 relative border-b xl:border-b-0 xl:border-l border-gray-200">
+219:                             <!-- Decor inside left side -->
+220:                             <div class="absolute top-0 right-0 w-32 h-32 bg-wood-100 rounded-bl-[100px] opacity-40 -mr-4 -mt-4"></div>
+221:                             <h3 class="text-2xl font-black mb-8 text-gray-900 relative z-10 flex items-center"><i class="fas fa-receipt text-wood-500 ml-3 text-3xl"></i> زانیاری داواکاری</h3>
+222:                             
+223:                             <div class="space-y-6 relative z-10">
+224:                                 <div class="space-y-2">
+225:                                     <label class="block text-sm font-bold text-gray-700">جۆری پارکێت <span class="text-red-500">*</span></label>
+226:                                     <div class="relative group">
+227:                                         <i class="fas fa-box absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+228:                                         <select id="productSelect" required class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold transition-colors outline-none cursor-pointer appearance-none">
+229:                                             <option value="" disabled selected>تکایە هەڵبژێرە...</option>
+230:                                         </select>
+231:                                         <i class="fas fa-chevron-down absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+232:                                     </div>
+233:                                 </div>
+234:                                 <div class="space-y-2">
+235:                                     <label class="block text-sm font-bold text-gray-700">ڕووبەر (مەتر دووجا) <span class="text-red-500">*</span></label>
+236:                                     <div class="relative group">
+237:                                         <i class="fas fa-ruler-combined absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+238:                                         <input type="number" id="areaInput" required min="1" placeholder="بۆ نمونە: 45" class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold transition-colors outline-none" dir="ltr">
+239:                                     </div>
+240:                                 </div>
+241:                                 
+242:                                 <!-- Dynamic Receipt Preview -->
+243:                                 <div class="mt-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+244:                                     <div class="flex justify-between items-center mb-3">
+245:                                         <span class="text-gray-500 font-bold">نرخی یەک مەتر</span>
+246:                                         <span id="retailPricePreview" class="text-gray-900 font-black font-mono">0.00$</span>
+247:                                     </div>
+248:                                     <div class="flex justify-between items-center mb-4 pb-4 border-b border-dashed border-gray-200">
+249:                                         <span class="text-gray-500 font-bold">کۆی گشتی ڕووبەر</span>
+250:                                         <span id="retailAreaPreview" class="text-gray-900 font-black font-mono">0 m²</span>
+251:                                     </div>
+252:                                     <div class="flex justify-between items-center">
+253:                                         <span class="text-wood-600 font-black text-lg">کۆی گشتی نرخ</span>
+254:                                         <span id="retailTotalPreview" class="text-wood-600 font-black text-2xl font-mono">0.00$</span>
+255:                                     </div>
+256:                                 </div>
+257:                             </div>
+258:                         </div>
+259:                         
+260:                         <!-- Right Side: Customer Info -->
+261:                         <div class="w-full xl:w-3/5 p-8 md:p-12 relative bg-white">
+262:                             <h3 class="text-2xl font-black mb-8 text-gray-900 flex items-center"><i class="fas fa-user-circle text-wood-500 ml-3 text-3xl"></i> زانیاری کڕیار</h3>
+263:                             <div class="space-y-8">
+264:                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+265:                                     <div class="space-y-2">
+266:                                         <label class="block text-sm font-bold text-gray-700">ناوی تەواو <span class="text-red-500">*</span></label>
+267:                                         <div class="relative group">
+268:                                             <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+269:                                             <input type="text" id="nameInput" required placeholder="ناوی سیانیت بنووسە" class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 font-medium transition-colors outline-none">
+270:                                         </div>
+271:                                     </div>
+272:                                     <div class="space-y-2">
+273:                                         <label class="block text-sm font-bold text-gray-700">مۆبایل <span class="text-red-500">*</span></label>
+274:                                         <div class="relative group">
+275:                                             <i class="fas fa-phone absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+276:                                             <input type="tel" id="phoneInput" required placeholder="0750 000 0000" dir="ltr" class="w-full pl-12 pr-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 text-left font-bold transition-colors outline-none">
+277:                                         </div>
+278:                                     </div>
+279:                                 </div>
+280:                                 
+281:                                 <div class="space-y-2">
+282:                                     <label class="block text-sm font-bold text-gray-700">ناونیشانی تەواو <span class="text-red-500">*</span></label>
+283:                                     <div class="relative group">
+284:                                         <i class="fas fa-map-marker-alt absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+285:                                         <input type="text" id="addressInput" required placeholder="شار، گەڕەک، کۆڵان..." class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-gray-50/50 font-medium transition-colors outline-none">
+286:                                     </div>
+287:                                 </div>
+288:                                 
+289:                                 <div class="space-y-2">
+290:                                     <div class="flex justify-between items-end">
+291:                                         <label class="block text-sm font-bold text-gray-700">دیاریکردنی شوێن لەسەر نەخشە <span class="text-red-500">*</span></label>
+292:                                         <span class="text-xs text-gray-500 font-medium"><i class="fas fa-info-circle"></i> مارکەرەکە ڕابکێشە</span>
+293:                                     </div>
+294:                                     <div class="p-1.5 bg-gray-100 rounded-2xl shadow-inner border border-gray-200"><div id="map" class="rounded-xl overflow-hidden shadow-sm" style="height: 350px; width: 100%; border:none;"></div></div>
+295:                                     <input type="hidden" id="latInput" required><input type="hidden" id="lngInput" required>
+296:                                 </div>
+297:                                 
+298:                                 <div class="pt-4">
+299:                                     <button type="submit" id="submitBtn" class="w-full py-5 rounded-xl font-black text-white bg-gradient-to-l from-wood-600 to-wood-800 hover:from-wood-700 hover:to-wood-900 shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 flex justify-center items-center gap-3 text-xl pulse-btn">
+300:                                         <i class="fab fa-telegram-plane text-2xl"></i> ناردنی داواکاری بۆ کۆمپانیا
+301:                                     </button>
+302:                                 </div>
+303:                             </div>
+304:                         </div>
+305:                     </form>
+306:                     </div>
+307:                 </div>
+308:             </section>
+309:         </main>
+310: 
+311:         <footer id="site-footer" class="bg-wood-950 text-white py-16 text-center border-t-[8px] border-gold-500 relative overflow-hidden">
+312:             <div class="absolute inset-0 opacity-5" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');"></div>
+313:             <div class="relative z-10 flex flex-col items-center justify-center">
+314:                 <div class="w-16 h-16 bg-gradient-to-br from-wood-800 to-wood-900 rounded-2xl flex items-center justify-center text-gold-400 font-bold text-3xl mb-6 shadow-inner border border-wood-700">ZP</div>
+315:                 <h3 class="text-3xl font-black mb-3 tracking-tight">Zone <span class="text-gold-500">Parquet</span></h3>
+316:                 <p class="text-wood-400 text-sm font-medium max-w-md mx-auto leading-relaxed"><span data-i18n="footer_desc">باشترین جۆرەکانی پارکێت بە گەرەنتی و کوالیتی بەرز بۆ ماڵ و شوێنی کارەکەت.</span></p>
+317:                 <div class="w-24 h-px bg-wood-800 my-8"></div>
+318:                 <p class="text-wood-500 text-sm font-bold"><span data-i18n="footer_copy">&copy; 2026 گشت مافەکانی پارێزراوە بۆ زۆن پارکێت.</span></p>
+319:             </div>
+320:         </footer>
+321:     </div>
+322: 
+323: 
+324:     <div id="wholesale-app" class="hidden">
+325:         <header id="wholesale-site-header" class="bg-white/85 backdrop-blur-xl shadow-sm sticky top-0 z-40 transition-all border-b border-gray-100">
+326:             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+327:                 <div class="flex justify-between items-center h-20">
+328:                     <div class="flex items-center">
+329:                         <a href="#" id="wholesale-brand-logo" class="flex items-center gap-3 group cursor-pointer select-none" title="Zone Parquet">
+330:                             <div class="w-12 h-12 bg-gradient-to-br from-gray-800 to-black rounded-xl flex items-center justify-center text-gold-400 font-bold text-2xl shadow-lg transition-transform group-hover:scale-105 border border-wood-500/30">ZP</div>
+331:                             <div class="flex flex-col">
+332:                                 <span class="font-black text-2xl tracking-tight text-gold-500 leading-none">Zone <span class="text-gold-400">Wholesale</span></span>
+333:                             </div>
+334:                         </a>
+335:                     </div>
+336:                     <div class="flex items-center gap-4">
+337:                         <div class="relative bg-gray-50 border border-gray-200 rounded-xl overflow-hidden flex items-center px-2 py-1 shadow-sm">
+338:                             <i class="fas fa-globe text-gray-400 text-sm ml-2 mr-2"></i>
+339:                             <select id="langSwitcher" onchange="changeLanguage(this.value)" class="bg-transparent text-gray-700 text-sm font-bold focus:outline-none appearance-none cursor-pointer py-1 pr-6 pl-2" dir="ltr">
+340:                                 <option value="ku" selected>کوردی</option>
+341:                                 <option value="en">English</option>
+342:                                 <option value="ar">العربية</option>
+343:                             </select>
+344:                             <i class="fas fa-chevron-down absolute right-2 text-[10px] text-gray-400 pointer-events-none"></i>
+345:                         </div>
+346:                         <nav id="main-nav" class="hidden md:flex space-x-8 space-x-reverse items-center">
+347:                             <a href="#catalog" class="text-gray-600 hover:text-wood-600 font-bold transition" data-i18n="nav_catalog">کەتەلۆگ</a>
+348:                             <a href="#order" class="px-6 py-2.5 rounded-full bg-wood-900 text-white font-bold hover:bg-wood-800 transition shadow-md hover:shadow-lg" data-i18n="nav_order">داواکردن</a>
+349:                         </nav>
+350:                     </div>
+351:                 </div>
+352:             </div>
+353:         </header>
+354: 
+355:         <main>
+356:             <!-- Hero -->
+357:             <section class="relative bg-wood-900 overflow-hidden text-white py-28 lg:py-40 flex flex-col items-center text-center">
+358:                 <div class="absolute inset-0 z-0">
+359:                     <img src="https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?auto=format&fit=crop&w=1920&q=80" class="w-full h-full object-cover opacity-20 mix-blend-luminosity">
+360:                     <div class="absolute inset-0 bg-gradient-to-t from-wood-950 via-wood-900/60 to-transparent"></div>
+361:                     <div class="absolute inset-0 bg-gradient-to-b from-wood-900/80 via-transparent to-transparent"></div>
+362:                 </div>
+363:                 <div class="relative z-10 max-w-5xl mx-auto px-4">
+364:                     <div class="inline-block px-4 py-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400 font-bold text-sm mb-6 fade-in-up backdrop-blur-md shadow-glass"><span data-i18n="hero_badge">بەرزترین کوالیتی پارکێت لە کوردستان</span></div>
+365:                     <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 fade-in-up" style="animation-delay: 0.1s; line-height: 1.2;">
+366:                         <span data-i18n="hero_title_1">جوانی و سروشت بۆ</span> <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-wood-300"><span data-i18n="hero_title_2">ناوەوەی ماڵەکەت</span></span>
+367:                     </h1>
+368:                     <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-2xl mx-auto fade-in-up font-medium" style="animation-delay: 0.2s;">
+369:                         <span data-i18n="hero_desc">بەرزترین ئاستی پارکێت، دژە ئاو، ڕەنگی نەگۆڕ و ستایلی سەردەمیانە. ئێستا جۆرەکان ببینە و ڕاستەوخۆ داوای بکە بۆ گەیاندن.</span>
+370:                     </p>
+371:                     <div class="mt-10 fade-in-up" style="animation-delay: 0.3s;">
+372:                         <a href="#catalog" class="px-8 py-4 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-gold-500 font-black text-lg hover:shadow-glow transition pulse-btn inline-flex items-center gap-2">
+373:                             <span data-i18n="hero_btn">بینینی کەتەلۆگ</span> <i class="fas fa-arrow-down"></i>
+374:                         </a>
+375:                     </div>
+376:                 </div>
+377:             </section>
+378: 
+379:             <!-- Catalog -->
+380:             <section id="catalog" class="py-24 bg-gray-50 relative">
+381:                 <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+382:                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+383:                     <div class="flex flex-col mb-16 gap-6">
+384:                         <div class="text-center md:text-right">
+385:                             <h2 class="text-4xl font-black text-gray-900 mb-3"><span data-i18n="cat_title">کەتەلۆگی بەرهەمەکان</span></h2>
+386:                             <p class="text-gray-500 font-medium"><span data-i18n="cat_desc">جۆرە جیاوازەکانی پارکێت بە قیاس و ڕەنگی جیاواز</span></p>
+387:                         </div>
+388:                         <div class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between z-20 relative">
+389:                             <div class="flex flex-wrap justify-center gap-2">
+390:                                 <button class="filter-btn-whole active px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50" data-filter="all">هەمووی</button>
+391:                                 <button class="filter-btn-whole px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 flex items-center gap-2" data-filter="waterproof"><i class="fas fa-shield-alt text-blue-500"></i> <span data-i18n="cat_water">دژە ئاو</span></button>
+392:                             </div>
+393:                             <div class="flex flex-wrap gap-3 items-center justify-center">
+394:                                 <div class="relative group">
+395:                                     <i class="fas fa-sort-amount-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+396:                                     <select id="sortPriceWhole" onchange="window.applyWholesaleFilters()" class="pr-12 pl-8 py-2.5 bg-gray-50 border-2 border-gray-100 hover:border-wood-300 rounded-xl text-sm font-bold outline-none focus:border-wood-500 transition-colors cursor-pointer appearance-none">
+397:                                         <option value="">ڕیزکردنی نرخ</option>
+398:                                         <option value="asc">کەمترین بۆ بەرزترین</option>
+399:                                         <option value="desc">بەرزترین بۆ کەمترین</option>
+400:                                     </select>
+401:                                     <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+402:                                 </div>
+403:                                 <div class="relative group">
+404:                                     <i class="fas fa-globe absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+405:                                     <select id="filterCountryWhole" onchange="window.applyWholesaleFilters()" class="pr-12 pl-8 py-2.5 bg-gray-50 border-2 border-gray-100 hover:border-wood-300 rounded-xl text-sm font-bold outline-none focus:border-wood-500 transition-colors cursor-pointer appearance-none">
+406:                                         <option value="">هەموو وڵاتێک</option>
+407:                                     </select>
+408:                                     <i class="fas fa-chevron-down absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+409:                                 </div>
+410:                                 <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-xl border-2 border-gray-100 focus-within:border-wood-500 transition-colors hover:border-wood-300">
+411:                                     <input type="number" id="minPriceWhole" placeholder="کەمترین $" oninput="window.applyWholesaleFilters()" class="w-24 bg-white px-3 py-1.5 rounded-lg text-sm font-bold outline-none text-center shadow-sm" dir="ltr">
+412:                                     <span class="text-gray-400 font-black">-</span>
+413:                                     <input type="number" id="maxPriceWhole" placeholder="بەرزترین $" oninput="window.applyWholesaleFilters()" class="w-24 bg-white px-3 py-1.5 rounded-lg text-sm font-bold outline-none text-center shadow-sm" dir="ltr">
+414:                                 </div>
+415:                             </div>
+416:                         </div>
+417:                     </div>
+418:                     
+419:                     <!-- Loading State -->
+420:                     <div id="catalog-loading" class="text-center py-20">
+421:                         <div class="w-16 h-16 border-4 border-wood-200 border-t-wood-600 rounded-full animate-spin mx-auto mb-6"></div>
+422:                         <p class="text-gray-500 font-bold text-lg"><span data-i18n="cat_loading">خەریکی هێنانی زانیارییەکان...</span></p>
+423:                     </div>
+424: 
+425:                     <!-- Grid -->
+426:                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 hidden" id="product-grid"></div>
+427:                     
+428:                     <!-- Empty State -->
+429:                     <div id="empty-state" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300 shadow-sm">
+430:                         <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+431:                         <h3 class="text-2xl font-bold text-gray-600"><span data-i18n="cat_empty">هیچ بەرهەمێک لە کەتەلۆگدا نییە.</span></h3>
+432:                     </div>
+433:                 </div>
+434:             </section>
+435: 
+436:             <!-- Order Form -->
+437:             <section id="wOrder" class="py-24 bg-white relative">
+438:                 <div class="max-w-5xl mx-auto px-4 relative z-10">
+439:                     <div class="bg-white rounded-[2.5rem] shadow-premium overflow-hidden border border-gray-100 relative">
+440:                         <!-- Decor -->
+441:                         <div class="absolute top-0 right-0 w-64 h-64 bg-wood-100 rounded-full blur-3xl -mr-32 -mt-32 z-0 opacity-50"></div>
+442:                         <div class="absolute bottom-0 left-0 w-64 h-64 bg-gold-50 rounded-full blur-3xl -ml-32 -mb-32 z-0 opacity-50"></div>
+443:                         
+444:                         <div class="bg-gradient-to-r from-wood-950 to-wood-800 text-white p-10 md:p-14 text-center relative z-10 overflow-hidden">
+445:                             <div class="absolute inset-0 opacity-10" style="background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');"></div>
+446:                             <h2 class="text-4xl font-black mb-4 relative z-10"><span data-i18n="order_title">فۆڕمی داواکاری پڕۆفیشناڵ</span></h2>
+447:                             <p class="text-wood-300 font-medium relative z-10 max-w-lg mx-auto"><span data-i18n="order_desc">زانیارییەکانت بە وردی پڕبکەرەوە، تیمی ئێمە لە کەمترین کاتدا پەیوەندیت پێوە دەکەن.</span></p>
+448:                         </div>
+449:                     <form id="wholesaleOrderForm" class="bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden border border-gray-100 relative flex flex-col xl:flex-row">
+450:                         <!-- Left Side: Order Details & Total (Receipt style) -->
+451:                         <div class="w-full xl:w-2/5 bg-gray-50 p-8 md:p-12 relative border-b xl:border-b-0 xl:border-l border-gray-200">
+452:                             <!-- Decor inside left side -->
+453:                             <div class="absolute top-0 right-0 w-32 h-32 bg-wood-100 rounded-bl-[100px] opacity-40 -mr-4 -mt-4"></div>
+454:                             <h3 class="text-2xl font-black mb-8 text-gray-900 relative z-10 flex items-center"><i class="fas fa-receipt text-wood-500 ml-3 text-3xl"></i> زانیاری داواکاری</h3>
+455:                             
+456:                             <div class="space-y-6 relative z-10">
+457:                                 <div class="space-y-2">
+458:                                     <label class="block text-sm font-bold text-gray-700">جۆری پارکێت <span class="text-red-500">*</span></label>
+459:                                     <div class="relative group">
+460:                                         <i class="fas fa-box absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+461:                                         <select id="wProductSelect" required class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold transition-colors outline-none cursor-pointer appearance-none">
+462:                                             <option value="" disabled selected>تکایە هەڵبژێرە...</option>
+463:                                         </select>
+464:                                         <i class="fas fa-chevron-down absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+465:                                     </div>
+466:                                 </div>
+467:                                 <div class="space-y-2">
+468:                                     <label class="block text-sm font-bold text-gray-700">ڕووبەر (مەتر دووجا) <span class="text-red-500">*</span></label>
+469:                                     <div class="relative group">
+470:                                         <i class="fas fa-ruler-combined absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+471:                                         <input type="number" id="wAreaInput" required min="1" placeholder="بۆ نمونە: 45" class="w-full pr-12 pl-5 py-4 rounded-xl border-2 border-gray-100 shadow-sm hover:border-wood-300 transition-colors focus:border-wood-500 bg-white font-bold transition-colors outline-none" dir="ltr">
+472:                                     </div>
+473:                                 </div>
+474:                                 
+475:                                 <!-- Dynamic Receipt Preview -->
+476:                                 <div class="mt-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+477:                                     <div class="flex justify-between items-center mb-3">
+478:                                         <span class="text-gray-500 font-bold">نرخی یەک مەتر</span>
+479:                                         <span id="wholePricePreview" class="text-gray-900 font-black font-mono">0.00$</span>
+480:                                     </div>
+481:                                     <div class="flex justify-between items-center mb-4 pb-4 border-b border-dashed border-gray-200">
+482:                                         <span class="text-gray-500 font-bold">کۆی گشتی ڕووبەر</span>
+483:                                         <span id="wholeAreaPreview" class="text-gray-900 font-black font-mono">0 m²</span>
+484:                                     </div>
+485:                                     <div class="flex justify-between items-center">
+486:                                         <span class="text-gold-600 font-black text-lg">کۆی گشتی نرخ</span>
+487:                                         <span id="wholeTotalPreview" class="text-gold-600 font-black text-2xl font-mono">0.00$</span>
+488:                                     </div>
+489:                                 </div>
+490:                             </div>
+491:                         </div>
+492:                         
+493:                         <!-- Right Side: Customer Info -->
+494:                         <div class="w-full xl:w-3/5 p-8 md:p-12 relative bg-white">
+495:                             <h3 class="text-2xl font-black mb-8 text-gray-900 flex items-center"><i class="fas fa-user-circle text-wood-500 ml-3 text-3xl"></i> زانیاری کڕیار</h3>
+496:                             <div class="space-y-8">
+497:                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+498:                                     <div class="space-y-2">
+499:                                         <label class="block text-sm font-bold text-gray-700">ناوی تەواو <span class="text-red-500">*</span></label>
+500:                                         <div class="relative group">
+501:                                             <i class="fas fa-user absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-wood-600 transition-colors"></i>
+502:                                             <input type="text" id="wN
+<truncated 29013 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.

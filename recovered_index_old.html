@@ -1,0 +1,424 @@
+Created At: 2026-06-21T02:39:28Z
+Completed At: 2026-06-21T02:39:28Z
+File Path: `file:///c:/Users/Ram%20Computer/OneDrive/Desktop/mas%20menu%20plaform%20menu/shinglbana%20resort%20-%20admin/admin.html`
+Total Lines: 416
+Total Bytes: 25897
+Showing lines 1 to 416
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: <!DOCTYPE html>
+2: <html lang="ku" dir="rtl" class="rtl">
+3: <head>
+4:     <meta charset="UTF-8">
+5:     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+6:     <title>پەنێڵی ئەدمین | Shingelbana</title>
+7:     
+8:     <!-- Tailwind CSS -->
+9:     <script src="https://cdn.tailwindcss.com"></script>
+10:     
+11:     <!-- Phosphor Icons -->
+12:     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+13:     
+14:     <!-- Custom CSS -->
+15:     <link rel="stylesheet" href="admin.css">
+16: </head>
+17: <body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden relative selection:bg-blue-200">
+18: 
+19:     <div id="toast-container"></div>
+20: 
+21:     <!-- Background Decoration -->
+22:     <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+23:         <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/20 rounded-full blur-[100px]"></div>
+24:         <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-400/20 rounded-full blur-[100px]"></div>
+25:     </div>
+26: 
+27:     <!-- ================= LOGIN SECTION ================= -->
+28:     <div id="login-section" class="absolute inset-0 z-50 flex items-center justify-center p-6 bg-gray-50/50 backdrop-blur-md">
+29:         <div class="glass w-full max-w-md p-8 rounded-3xl text-center fade-in">
+30:             <div class="w-24 h-24 mx-auto mb-6">
+31:                 <img src="https://special-copper-xytsg3zzok.edgeone.app/Untitled%20design%20-%202026-02-25T031040.798.png" alt="Logo" class="w-full h-full object-contain drop-shadow-md">
+32:             </div>
+33:             <h1 class="text-2xl font-bold mb-2">چوونە ژوورەوە</h1>
+34:             <p class="text-gray-500 mb-8 text-sm">زانیارییەکانی ئەدمین بنووسە بۆ چوونە ژوورەوە</p>
+35:             
+36:             <form id="login-form" class="space-y-4">
+37:                 <div class="relative">
+38:                     <i class="ph ph-envelope absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+39:                     <input type="email" id="login-email" placeholder="ئیمەیڵ" required class="w-full glass-input pr-12 pl-4 py-3 rounded-xl outline-none text-right" dir="ltr">
+40:                 </div>
+41:                 <div class="relative">
+42:                     <i class="ph ph-key absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
+43:                     <input type="password" id="login-password" placeholder="وشەی نهێنی" required class="w-full glass-input pr-12 pl-4 py-3 rounded-xl outline-none text-right" dir="ltr">
+44:                 </div>
+45:                 <button type="submit" id="login-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/30 mt-4 flex justify-center items-center gap-2">
+46:                     <span id="login-btn-text">چوونە ژوورەوە</span>
+47:                     <i id="login-btn-icon" class="ph ph-sign-in text-lg"></i>
+48:                 </button>
+49:             </form>
+50:             
+51:             <div class="mt-4 text-sm text-gray-500">
+52:                 <span id="auth-toggle-text">ئەکاونتت نییە؟</span> 
+53:                 <button type="button" id="toggle-auth-btn" class="text-blue-600 font-bold hover:underline focus:outline-none">هەژمارێکی نوێ دروست بکە</button>
+54:             </div>
+55:         </div>
+56:     </div>
+57: 
+58:     <!-- ================= MAIN DASHBOARD ================= -->
+59:     <div id="dashboard-section" class="auth-hidden flex flex-col h-full w-full max-w-lg mx-auto bg-white/40 shadow-2xl relative">
+60:         
+61:         <!-- Header -->
+62:         <header class="glass rounded-b-3xl px-6 py-4 sticky top-0 z-40 flex items-center justify-between">
+63:             <div>
+64:                 <h1 class="text-lg font-bold text-gray-800">پەنێڵی بەڕێوەبردن</h1>
+65:                 <p id="admin-email-display" class="text-xs text-gray-500" dir="ltr">admin@shingelbana.com</p>
+66:             </div>
+67:             <button id="logout-btn" class="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition-colors">
+68:                 <i class="ph ph-sign-out text-xl"></i>
+69:             </button>
+70:         </header>
+71: 
+72:         <!-- Content Area -->
+73:         <main class="flex-1 overflow-y-auto p-4 pb-24 scroll-smooth">
+74:             
+75:             <!-- Items Section -->
+76:             <section id="sec-items" class="nav-section fade-in">
+77:                 <div class="flex justify-between items-center mb-6">
+78:                     <h2 class="text-xl font-bold">خواردنەکان</h2>
+79:                     <button onclick="openModal('item-modal')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-600/20">
+80:                         <i class="ph ph-plus-circle text-lg"></i>
+81:                         <span>زیادکردن</span>
+82:                     </button>
+83:                 </div>
+84:                 <!-- Filters -->
+85:                 <div class="mb-4 flex gap-2 overflow-x-auto no-scrollbar pb-2">
+86:                     <select id="filter-category" class="glass-input px-4 py-2 rounded-xl text-sm font-semibold outline-none border-gray-200">
+87:                         <option value="all">هەموو کەتەگۆرییەکان</option>
+88:                         <!-- Options injected via JS -->
+89:                     </select>
+90:                     <div class="relative flex-1 min-w-[150px]">
+91:                         <i class="ph ph-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+92:                         <input type="text" id="search-item" placeholder="گەڕان..." class="w-full glass-input pr-9 pl-3 py-2 rounded-xl text-sm outline-none border-gray-200">
+93:                     </div>
+94:                 </div>
+95:                 
+96:                 <div id="items-list" class="flex flex-col gap-3">
+97:                     <!-- Items injected via JS -->
+98:                     <div class="flex items-center justify-center py-10 text-gray-400"><i class="ph ph-spinner-gap animate-spin text-3xl"></i></div>
+99:                 </div>
+100:             </section>
+101: 
+102:             <!-- Categories Section -->
+103:             <section id="sec-categories" class="nav-section hidden fade-in">
+104:                 <div class="flex justify-between items-center mb-6">
+105:                     <h2 class="text-xl font-bold">کەتەگۆرییەکان</h2>
+106:                     <button onclick="openModal('category-modal')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-600/20">
+107:                         <i class="ph ph-plus-circle text-lg"></i>
+108:                         <span>زیادکردن</span>
+109:                     </button>
+110:                 </div>
+111:                 <div id="categories-list" class="flex flex-col gap-3">
+112:                     <!-- Categories injected via JS -->
+113:                 </div>
+114:             </section>
+115: 
+116:             <!-- Banners Section -->
+117:             <section id="sec-banners" class="nav-section hidden fade-in">
+118:                 <div class="flex justify-between items-center mb-6">
+119:                     <h2 class="text-xl font-bold">باینەرەکان (Banners)</h2>
+120:                     <button onclick="openModal('banner-modal')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-600/20">
+121:                         <i class="ph ph-plus-circle text-lg"></i>
+122:                         <span>زیادکردن</span>
+123:                     </button>
+124:                 </div>
+125:                 <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-xl mb-4 border border-blue-100">
+126:                     <i class="ph ph-info mr-1"></i> ئەم وێنانە لە سەرەوەی پەڕەی مێنووەکە بە شێوازی سلایدەر دەردەکەون. پێشنیار دەکرێت وێنەکان بە درێژی (Landscape) بن.
+127:                 </div>
+128:                 <div id="banners-list" class="flex flex-col gap-4">
+129:                     <!-- Banners injected via JS -->
+130:                 </div>
+131:             </section>
+132: 
+133:             <!-- Settings Section -->
+134:             <section id="sec-settings" class="nav-section hidden fade-in">
+135:                 <h2 class="text-xl font-bold mb-6">ڕێکخستنە گشتییەکان</h2>
+136:                 <div class="glass-card p-5">
+137:                     <form id="settings-form" class="space-y-5">
+138:                         <!-- Restaurant Name (Multilingual) -->
+139:                         <div>
+140:                             <label class="block text-sm font-bold text-gray-700 mb-2">ناوی چێشتخانە</label>
+141:                             <div class="space-y-2">
+142:                                 <div class="flex items-center gap-2">
+143:                                     <span class="w-12 text-xs font-bold text-gray-400 bg-gray-100 rounded py-1 text-center">کوردی</span>
+144:                                     <input type="text" id="set-name-ku" class="flex-1 glass-input px-3 py-2 rounded-lg text-sm" required>
+145:                                 </div>
+146:                                 <div class="flex items-center gap-2">
+147:                                     <span class="w-12 text-xs font-bold text-gray-400 bg-gray-100 rounded py-1 text-center">عەرەبی</span>
+148:                                     <input type="text" id="set-name-ar" class="flex-1 glass-input px-3 py-2 rounded-lg text-sm" required>
+149:                                 </div>
+150:                                 <div class="flex items-center gap-2">
+151:                                     <span class="w-12 text-xs font-bold text-gray-400 bg-gray-100 rounded py-1 text-center" dir="ltr">EN</span>
+152:                                     <input type="text" id="set-name-en" class="flex-1 glass-input px-3 py-2 rounded-lg text-sm" dir="ltr" required>
+153:                                 </div>
+154:                             </div>
+155:                         </div>
+156: 
+157:                         <div>
+158:                             <label class="block text-sm font-bold text-gray-700 mb-2">لینکی لۆگۆ</label>
+159:                             <input type="url" id="set-logo" class="w-full glass-input px-3 py-2 rounded-lg text-sm" dir="ltr" placeholder="https://...">
+160:                             <div class="mt-2 w-20 h-20 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden mx-auto">
+161:                                 <img id="set-logo-preview" src="" class="w-full h-full object-contain">
+162:                             </div>
+163:                         </div>
+164: 
+165:                         <div>
+166:                             <label class="block text-sm font-bold text-gray-700 mb-2">ژمارەی تەلەفۆن</label>
+167:                             <input type="text" id="set-phone" class="w-full glass-input px-3 py-2 rounded-lg text-sm text-left" dir="ltr" placeholder="+964...">
+168:                         </div>
+169: 
+170:                         <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-green-600/20 hover:bg-green-700 transition-colors">
+171:                             پاشکەوتکردنی گۆڕانکارییەکان
+172:                         </button>
+173:                     </form>
+174:                 </div>
+175:             </section>
+176: 
+177:             <!-- Feedback Section -->
+178:             <section id="sec-feedback" class="nav-section hidden fade-in">
+179:                 <div class="flex justify-between items-center mb-6">
+180:                     <h2 class="text-xl font-bold">فیدباک و سەرنجەکان</h2>
+181:                     <span id="feedback-count" class="bg-gray-200 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">0</span>
+182:                 </div>
+183:                 <div id="feedback-list" class="flex flex-col gap-4">
+184:                     <!-- Feedback injected via JS -->
+185:                 </div>
+186:             </section>
+187: 
+188:         </main>
+189: 
+190:         <!-- Bottom Navigation -->
+191:         <nav class="glass absolute bottom-4 left-4 right-4 rounded-2xl p-2 flex justify-between items-center z-40">
+192:             <button onclick="switchTab('items')" class="nav-btn active flex-1 flex flex-col items-center justify-center p-2 rounded-xl text-gray-400 hover:text-blue-600 transition-colors">
+193:                 <i class="ph-fill ph-list-dashes text-2xl mb-1"></i>
+194:                 <span class="text-[10px] font-bold">مێنوو</span>
+195:             </button>
+196:             <button onclick="switchTab('categories')" class="nav-btn flex-1 flex flex-col items-center justify-center p-2 rounded-xl text-gray-400 hover:text-blue-600 transition-colors">
+197:                 <i class="ph-fill ph-squares-four text-2xl mb-1"></i>
+198:                 <span class="text-[10px] font-bold">بەشەکان</span>
+199:             </button>
+200:             <button onclick="switchTab('banners')" class="nav-btn flex-1 flex flex-col items-center justify-center p-2 rounded-xl text-gray-400 hover:text-blue-600 transition-colors">
+201:                 <i class="ph-fill ph-image text-2xl mb-1"></i>
+202:                 <span class="text-[10px] font-bold">باینەر</span>
+203:             </button>
+204:             <button onclick="switchTab('settings')" class="nav-btn flex-1 flex flex-col items-center justify-center p-2 rounded-xl text-gray-400 hover:text-blue-600 transition-colors">
+205:                 <i class="ph-fill ph-gear text-2xl mb-1"></i>
+206:                 <span class="text-[10px] font-bold">ڕێکخستن</span>
+207:             </button>
+208:             <button onclick="switchTab('feedback')" class="nav-btn flex-1 flex flex-col items-center justify-center p-2 rounded-xl text-gray-400 hover:text-blue-600 transition-colors relative">
+209:                 <i class="ph-fill ph-chat-text text-2xl mb-1"></i>
+210:                 <span class="text-[10px] font-bold">سەرنجەکان</span>
+211:             </button>
+212:         </nav>
+213:     </div>
+214: 
+215:     <!-- ================= MODALS ================= -->
+216:     <div id="modal-backdrop" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[100] hidden flex items-end sm:items-center justify-center">
+217:         
+218:         <!-- Item Form Modal -->
+219:         <div id="item-modal" class="modal-content glass w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col hidden transform transition-transform translate-y-full sm:translate-y-0">
+220:             <div class="flex justify-between items-center p-5 border-b border-gray-100">
+221:                 <h3 id="item-modal-title" class="text-lg font-bold">زیادکردنی خواردن</h3>
+222:                 <button onclick="closeModals()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="ph ph-x"></i></button>
+223:             </div>
+224:             <div class="overflow-y-auto p-5 pb-8 flex-1">
+225:                 <form id="item-form" class="space-y-4">
+226:                     <input type="hidden" id="item-id">
+227:                     
+228:                     <div>
+229:                         <label class="block text-xs font-bold text-gray-700 mb-1">ناوی خواردن (کوردی، عەرەبی، ئینگلیزی)</label>
+230:                         <div class="flex flex-col gap-2">
+231:                             <input type="text" id="item-name-ku" placeholder="کوردی" required class="glass-input px-3 py-2 rounded-lg text-sm">
+232:                             <input type="text" id="item-name-ar" placeholder="عەرەبی" required class="glass-input px-3 py-2 rounded-lg text-sm">
+233:                             <input type="text" id="item-name-en" placeholder="English" required class="glass-input px-3 py-2 rounded-lg text-sm" dir="ltr">
+234:                         </div>
+235:                     </div>
+236: 
+237:                     <div>
+238:                         <label class="block text-xs font-bold text-gray-700 mb-1">وەسف / پێکهاتەکان (ئارەزوومەندانە)</label>
+239:                         <div class="flex flex-col gap-2">
+240:                             <input type="text" id="item-desc-ku" placeholder="کوردی" class="glass-input px-3 py-2 rounded-lg text-sm">
+241:                             <input type="text" id="item-desc-ar" placeholder="عەرەبی" class="glass-input px-3 py-2 rounded-lg text-sm">
+242:                             <input type="text" id="item-desc-en" placeholder="English" class="glass-input px-3 py-2 rounded-lg text-sm" dir="ltr">
+243:                         </div>
+244:                     </div>
+245: 
+246:                     <div class="grid grid-cols-2 gap-4">
+247:                         <div>
+248:                             <label class="block text-xs font-bold text-gray-700 mb-1">نرخ</label>
+249:                             <input type="text" id="item-price" required placeholder="نمونە: 10,000" class="glass-input w-full px-3 py-2 rounded-lg text-sm" dir="ltr">
+250:                         </div>
+251:                         <div>
+252:                             <label class="block text-xs font-bold text-gray-700 mb-1">کەتەگۆری</label>
+253:                             <select id="item-category" required class="glass-input w-full px-3 py-2 rounded-lg text-sm">
+254:                                 <!-- Options injected via JS -->
+255:                             </select>
+256:                         </div>
+257:                     </div>
+258: 
+259:                     <div>
+260:                         <label class="block text-xs font-bold text-gray-700 mb-1">لینکی وێنە (URL)</label>
+261:                         <input type="url" id="item-image" required placeholder="https://..." class="glass-input w-full px-3 py-2 rounded-lg text-sm" dir="ltr">
+262:                         <div class="mt-2 text-xs text-gray-500">پێشنیار دەکرێت وێنەکە چوارگۆشە بێت بۆ باشترین دەرکەوتن.</div>
+263:                     </div>
+264: 
+265:                     <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition-colors mt-6">پاشکەوتکردن</button>
+266:                 </form>
+267:             </div>
+268:         </div>
+269: 
+270:         <!-- Category Form Modal -->
+271:         <div id="category-modal" class="modal-content glass w-full max-w-sm bg-white rounded-t-3xl sm:rounded-3xl p-6 hidden transform transition-transform translate-y-full sm:translate-y-0">
+272:             <div class="flex justify-between items-center mb-5">
+273:                 <h3 id="category-modal-title" class="text-lg font-bold">زیادکردنی کەتەگۆری</h3>
+274:                 <button onclick="closeModals()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="ph ph-x"></i></button>
+275:             </div>
+276:             <form id="category-form" class="space-y-4">
+277:                 <input type="hidden" id="category-id">
+278:                 
+279:                 <div class="flex flex-col gap-2">
+280:                     <label class="text-xs font-bold text-gray-700">ناوی کەتەگۆری</label>
+281:                     <input type="text" id="cat-name-ku" placeholder="کوردی" required class="glass-input px-3 py-2 rounded-lg text-sm">
+282:                     <input type="text" id="cat-name-ar" placeholder="عەرەبی" required class="glass-input px-3 py-2 rounded-lg text-sm">
+283:                     <input type="text" id="cat-name-en" placeholder="English" required class="glass-input px-3 py-2 rounded-lg text-sm" dir="ltr">
+284:                 </div>
+285: 
+286:                 <div>
+287:                     <label class="block text-xs font-bold text-gray-700 mb-1">لینکی وێنەی کەتەگۆری (URL)</label>
+288:                     <input type="url" id="cat-image" required placeholder="https://..." class="glass-input w-full px-3 py-2 rounded-lg text-sm" dir="ltr">
+289:                 </div>
+290:                 
+291:                 <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition-colors mt-2">پاشکەوتکردن</button>
+292:             </form>
+293:         </div>
+294: 
+295:         <!-- Banner Form Modal -->
+296:         <div id="banner-modal" class="modal-content glass w-full max-w-sm bg-white rounded-t-3xl sm:rounded-3xl p-6 hidden transform transition-transform translate-y-full sm:translate-y-0">
+297:             <div class="flex justify-between items-center mb-5">
+298:                 <h3 class="text-lg font-bold">زیادکردنی باینەر</h3>
+299:                 <button onclick="closeModals()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"><i class="ph ph-x"></i></button>
+300:             </div>
+301:             <form id="banner-form" class="space-y-4">
+302:                 <div>
+303:                     <label class="block text-xs font-bold text-gray-700 mb-1">لینکی وێنەی باینەر (URL)</label>
+304:                     <input type="url" id="banner-image" required placeholder="https://..." class="glass-input w-full px-3 py-2 rounded-lg text-sm" dir="ltr">
+305:                 </div>
+306:                 <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition-colors mt-2">پاشکەوتکردن</button>
+307:             </form>
+308:         </div>
+309: 
+310:         <!-- Delete Confirmation Modal -->
+311:         <div id="delete-modal" class="modal-content glass w-full max-w-sm bg-white rounded-3xl p-6 hidden transform transition-transform scale-95 opacity-0">
+312:             <div class="text-center">
+313:                 <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600">
+314:                     <i class="ph ph-trash text-3xl"></i>
+315:                 </div>
+316:                 <h3 class="text-lg font-bold mb-2 text-gray-800">دڵنیایت لە سڕینەوە؟</h3>
+317:                 <p class="text-sm text-gray-500 mb-6">ئەم کردارە پاشگەزبوونەوەی تێدا نییە.</p>
+318:                 <div class="flex gap-3">
+319:                     <button onclick="closeModals()" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200">نەخێر، پەشیمان بوومەوە</button>
+320:                     <button id="confirm-delete-btn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold shadow-lg shadow-red-600/20 hover:bg-red-700">بەڵێ، بیسڕەوە</button>
+321:                 </div>
+322:             </div>
+323:         </div>
+324:     </div>
+325: 
+326:     <!-- Firebase Configuration and Logic -->
+327:     <!-- Firebase Configuration and Logic -->
+328:     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+329:     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+330:     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+331:     <script src="firebase-config.js"></script>
+332:     <script src="admin.js"></script>
+333: 
+334:     <!-- UI Logic -->
+335:     <script>
+336:         function switchTab(tabId) {
+337:             // Update buttons
+338:             document.querySelectorAll('.nav-btn').forEach(btn => {
+339:                 btn.classList.remove('text-blue-600', 'active');
+340:                 btn.classList.add('text-gray-400');
+341:                 btn.querySelector('i').classList.replace('ph-fill', 'ph');
+342:             });
+343:             const activeBtn = document.querySelector(`.nav-btn[onclick="switchTab('${tabId}')"]`);
+344:             if(activeBtn) {
+345:                 activeBtn.classList.remove('text-gray-400');
+346:                 activeBtn.classList.add('text-blue-600', 'active');
+347:                 activeBtn.querySelector('i').classList.replace('ph', 'ph-fill');
+348:             }
+349: 
+350:             // Update sections
+351:             document.querySelectorAll('.nav-section').forEach(sec => sec.classList.add('hidden'));
+352:             document.getElementById('sec-' + tabId).classList.remove('hidden');
+353:         }
+354: 
+355:         function openModal(modalId) {
+356:             const backdrop = document.getElementById('modal-backdrop');
+357:             backdrop.classList.remove('hidden');
+358:             
+359:             document.querySelectorAll('.modal-content').forEach(m => {
+360:                 m.classList.add('hidden');
+361:                 if(m.id !== 'delete-modal') {
+362:                     m.classList.remove('translate-y-0');
+363:                     m.classList.add('translate-y-full');
+364:                 }
+365:             });
+366:             
+367:             const target = document.getElementById(modalId);
+368:             target.classList.remove('hidden');
+369:             
+370:             // Animation
+371:             setTimeout(() => {
+372:                 if(modalId === 'delete-modal') {
+373:                     target.classList.remove('scale-95', 'opacity-0');
+374:                 } else {
+375:                     target.classList.remove('translate-y-full');
+376:                     target.classList.add('translate-y-0');
+377:                 }
+378:             }, 10);
+379:         }
+380: 
+381:         function closeModals() {
+382:             const backdrop = document.getElementById('modal-backdrop');
+383:             
+384:             document.querySelectorAll('.modal-content').forEach(m => {
+385:                 if(m.id === 'delete-modal') {
+386:                     m.classList.add('scale-95', 'opacity-0');
+387:                 } else {
+388:                     m.classList.remove('translate-y-0');
+389:                     m.classList.add('translate-y-full');
+390:                 }
+391:             });
+392:             
+393:             setTimeout(() => {
+394:                 backdrop.classList.add('hidden');
+395:                 document.querySelectorAll('.modal-content').forEach(m => m.classList.add('hidden'));
+396:                 
+397:                 // Reset forms
+398:                 document.getElementById('item-form').reset();
+399:                 document.getElementById('item-id').value = '';
+400:                 document.getElementById('category-form').reset();
+401:                 document.getElementById('category-id').value = '';
+402:                 document.getElementById('banner-form').reset();
+403:                 
+404:             }, 300); // match transition duration
+405:         }
+406: 
+407:         // Close modal when clicking outside
+408:         document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+409:             if (e.target.id === 'modal-backdrop') {
+410:                 closeModals();
+411:             }
+412:         });
+413:     </script>
+414: </body>
+415: </html>
+416: 
+The above content shows the entire, complete file contents of the requested file.
